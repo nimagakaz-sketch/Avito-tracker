@@ -264,7 +264,6 @@
       color: #fff;
     }
 
-    /* Выпадающий список городов */
     .city-suggestions {
       position: absolute;
       top: calc(100% + 4px);
@@ -273,7 +272,7 @@
       background: #1c2128;
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
-      max-height: 170px;
+      max-height: 180px;
       overflow-y: auto;
       z-index: 1050;
       display: none;
@@ -292,7 +291,7 @@
       border-bottom: none;
     }
 
-    .city-item:active {
+    .city-item:hover, .city-item:active {
       background: rgba(56, 139, 253, 0.2);
     }
 
@@ -338,7 +337,7 @@
   <header>
     <div class="header-title">
       <h1>Avito Tracker</h1>
-      <p>Автоматический поиск по городам</p>
+      <p>Поиск по городам России</p>
     </div>
     <div class="pulse-badge">
       <div class="pulse-dot"></div>
@@ -380,8 +379,8 @@
       </div>
 
       <div class="form-group">
-        <label>Город или область</label>
-        <input type="text" id="inputCity" class="form-input" placeholder="Начните вводить город..." autocomplete="off">
+        <label>Город или область (Вся Россия)</label>
+        <input type="text" id="inputCity" class="form-input" placeholder="Начните вводить любой город..." autocomplete="off">
         <div id="cityList" class="city-suggestions"></div>
       </div>
 
@@ -410,13 +409,25 @@
       tg.expand();
     }
 
-    // База городов для подсказок
-    const POPULAR_CITIES = [
-      "Кемерово", "Новокузнецк", "Прокопьевск", "Ленинск-Кузнецкий", 
-      "Белово", "Междуреченск", "Юрга", "Анжеро-Судженск", 
-      "Кузбасс (область)", "Новосибирск", "Томск", "Барнаул", 
-      "Красноярск", "Омск", "Москва", "Санкт-Петербург", "Россия"
+    // Базовый список ключевых городов (пополняется динамически)
+    let ALL_CITIES = [
+      "Россия", "Кузбасс (область)", "Кемерово", "Новокузнецк", "Прокопьевск", "Ленинск-Кузнецкий", 
+      "Белово", "Междуреченск", "Юрга", "Анжеро-Судженск", "Киселевск", "Осинники", "Березовский",
+      "Новосибирск", "Томск", "Барнаул", "Красноярск", "Омск", "Иркутск", "Тюмень", "Екатеринбург",
+      "Челябинск", "Москва", "Санкт-Петербург", "Казань", "Нижний Новгород", "Самара", "Уфа",
+      "Ростов-на-Дону", "Краснодар", "Воронеж", "Пермь", "Волгоград", "Саратов", "Владивосток", "Хабаровск"
     ];
+
+    // Фоновая загрузка полного списка городов России (~1100 городов)
+    fetch("https://raw.githubusercontent.com/pensnarik/russian-cities/master/russian-cities.json")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const fetchedNames = data.map(c => c.name);
+          ALL_CITIES = Array.from(new Set([...ALL_CITIES, ...fetchedNames]));
+        }
+      })
+      .catch(() => {});
 
     let tasks = [
       { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
@@ -514,7 +525,7 @@
       });
     }
 
-    // Автодополнение города при вводе
+    // Умный поиск города с сортировкой по релевантности
     const inputCity = document.getElementById("inputCity");
     const cityList = document.getElementById("cityList");
 
@@ -526,7 +537,22 @@
         return;
       }
 
-      const matches = POPULAR_CITIES.filter(c => c.toLowerCase().includes(val));
+      // Сначала те, которые начинаются на введенные буквы, затем остальные совпадения
+      const startsWith = [];
+      const contains = [];
+
+      for (let i = 0; i < ALL_CITIES.length; i++) {
+        const c = ALL_CITIES[i];
+        const low = c.toLowerCase();
+        if (low.startsWith(val)) {
+          startsWith.push(c);
+        } else if (low.includes(val)) {
+          contains.push(c);
+        }
+        if (startsWith.length + contains.length > 25) break;
+      }
+
+      const matches = [...startsWith, ...contains].slice(0, 15);
       if (matches.length === 0) {
         cityList.style.display = "none";
         return;
