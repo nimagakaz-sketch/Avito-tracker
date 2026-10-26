@@ -123,7 +123,7 @@
       display: flex;
     }
 
-    .task-card, .item-card {
+    .task-card {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -225,62 +225,6 @@
       gap: 8px;
       cursor: pointer;
       margin-top: 10px;
-    }
-
-    .item-card {
-      border-left: 3px solid #388bfd;
-      gap: 10px;
-    }
-
-    .item-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .item-price {
-      font-size: 18px;
-      font-weight: 700;
-      color: #3fb950;
-    }
-
-    .item-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .badge-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-    }
-
-    .badge-tag.accent {
-      background: rgba(46, 160, 67, 0.2);
-      color: #3fb950;
-    }
-
-    .item-btn {
-      margin-top: 4px;
-      padding: 10px;
-      text-align: center;
-      background: rgba(56, 139, 253, 0.15);
-      border: 1px solid rgba(56, 139, 253, 0.3);
-      color: #58a6ff;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      display: block;
     }
 
     .modal-backdrop {
@@ -407,19 +351,14 @@
   </header>
 
   <div class="tabs-nav">
-    <button class="tab-btn active" id="tabBtnTasks" onclick="switchTab('tasks')">⚙️ Поиски</button>
-    <button class="tab-btn" id="tabBtnItems" onclick="switchTab('items')">📱 Объявления (<span id="itemsCount">0</span>)</button>
+    <button class="tab-btn active">⚙️ Активные поиски</button>
   </div>
 
-  <div class="tab-content active" id="tabTasks">
+  <div class="tab-content active">
     <div class="task-list" id="taskList"></div>
     <button class="add-task-btn" id="btnOpenAdd">
       <span>➕</span> Добавить модель для отслеживания
     </button>
-  </div>
-
-  <div class="tab-content" id="tabItems">
-    <div id="itemsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
   </div>
 
   <div class="modal-backdrop" id="modal">
@@ -462,8 +401,42 @@
       tg.expand();
     }
 
-    let tasks = [];
-    let itemsStore = {};
+    // Дефолтный список моделей, если URL открыт без параметров
+    let tasks = [
+      {
+        id: "1",
+        title: "iPhone 13",
+        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_13-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2M_Dc?s=104",
+        min_price: 20000,
+        max_price: 55000,
+        avg_price: 28813
+      },
+      {
+        id: "2",
+        title: "iPhone 15 Кемерово",
+        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_15-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2I_Dc?s=104",
+        min_price: 30000,
+        max_price: 85000,
+        avg_price: 64490
+      },
+      {
+        id: "3",
+        title: "iPhone 11",
+        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_11-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2E_Dc?s=104",
+        min_price: 7000,
+        max_price: 22000,
+        avg_price: 9443
+      },
+      {
+        id: "4",
+        title: "iPhone 14 Pro",
+        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_14_pro-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2K_Dc?s=104",
+        min_price: 40000,
+        max_price: 95000,
+        avg_price: 0
+      }
+    ];
+
     let editTaskId = null;
 
     function safeBase64Decode(str) {
@@ -476,27 +449,6 @@
       }
     }
 
-    function switchTab(tab) {
-      const btnTasks = document.getElementById("tabBtnTasks");
-      const btnItems = document.getElementById("tabBtnItems");
-      const viewTasks = document.getElementById("tabTasks");
-      const viewItems = document.getElementById("tabItems");
-
-      if (tab === "tasks") {
-        btnTasks.classList.add("active");
-        btnItems.classList.remove("active");
-        viewTasks.classList.add("active");
-        viewItems.classList.remove("active");
-        if (tg && tg.MainButton) tg.MainButton.show();
-      } else {
-        btnItems.classList.add("active");
-        btnTasks.classList.remove("active");
-        viewItems.classList.add("active");
-        viewTasks.classList.remove("active");
-        if (tg && tg.MainButton) tg.MainButton.hide();
-      }
-    }
-
     function initData() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -504,18 +456,16 @@
         if (encoded) {
           const decodedStr = safeBase64Decode(encoded);
           const payload = JSON.parse(decodedStr);
-          if (Array.isArray(payload)) {
+          if (Array.isArray(payload) && payload.length > 0) {
             tasks = payload;
-          } else if (payload && typeof payload === 'object') {
-            tasks = payload.tasks || [];
-            itemsStore = payload.items || {};
+          } else if (payload && typeof payload === 'object' && Array.isArray(payload.tasks) && payload.tasks.length > 0) {
+            tasks = payload.tasks;
           }
         }
       } catch (e) {
-        console.error("Parse data error", e);
+        console.error("Ошибка чтения данных:", e);
       }
       renderTasks();
-      renderItems();
       updateMainButton();
     }
 
@@ -527,17 +477,6 @@
     function renderTasks() {
       const container = document.getElementById("taskList");
       container.innerHTML = "";
-
-      if (!tasks || tasks.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 40px 10px; color: var(--text-muted);">
-            <div style="font-size: 32px; margin-bottom: 8px;">📱</div>
-            <div style="font-size: 15px; font-weight: 600; color: #fff;">Нет активных поисков</div>
-            <div style="font-size: 12px; margin-top: 4px;">Добавьте первую модель кнопкой ниже.</div>
-          </div>
-        `;
-        return;
-      }
 
       tasks.forEach((t) => {
         const card = document.createElement("div");
@@ -564,51 +503,6 @@
               <p class="market-pill">${t.avg_price ? "~" + formatPrice(t.avg_price) : "Расчет..."}</p>
             </div>
           </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderItems() {
-      const container = document.getElementById("itemsList");
-      container.innerHTML = "";
-
-      let allItems = [];
-      Object.keys(itemsStore).forEach(category => {
-        (itemsStore[category] || []).forEach(it => {
-          allItems.push({ ...it, category });
-        });
-      });
-
-      document.getElementById("itemsCount").innerText = allItems.length;
-
-      if (allItems.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 40px 10px; color: var(--text-muted);">
-            <div style="font-size: 34px; margin-bottom: 8px;">📦</div>
-            <div style="font-size: 15px; font-weight: 600; color: #fff;">Объявления пока собираются</div>
-            <div style="font-size: 12px; margin-top: 4px;">После нахождения ботом они появятся здесь.</div>
-          </div>
-        `;
-        return;
-      }
-
-      allItems.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "item-card";
-        
-        let tagsHtml = `<span class="badge-tag">${item.category}</span>`;
-        if (item.memory) tagsHtml += `<span class="badge-tag accent">💾 ${item.memory}</span>`;
-        if (item.color) tagsHtml += `<span class="badge-tag">🎨 ${item.color}</span>`;
-        tagsHtml += `<span class="badge-tag">${item.is_shop ? "🏢 Магазин" : "👤 Частник"}</span>`;
-
-        card.innerHTML = `
-          <div class="item-header">
-            <div class="item-title">${item.title}</div>
-            <div class="item-price">${formatPrice(item.price)}</div>
-          </div>
-          <div class="item-tags">${tagsHtml}</div>
-          <a href="${item.url}" target="_blank" class="item-btn">↗️ Открыть объявление на Авито</a>
         `;
         container.appendChild(card);
       });
