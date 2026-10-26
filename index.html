@@ -17,6 +17,7 @@
       --danger: #f85149;
       --blue: #388bfd;
       --blue-glow: rgba(56, 139, 253, 0.2);
+      --gold: #d29922;
     }
 
     * {
@@ -30,7 +31,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      padding: 16px 16px 140px;
+      padding: 16px 16px 100px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -45,7 +46,7 @@
     }
 
     .header-title h1 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -84,6 +85,21 @@
       100% { transform: scale(0.95); opacity: 0.7; }
     }
 
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Карточки задач */
     .task-card {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
@@ -168,6 +184,10 @@
       color: #388bfd !important;
     }
 
+    .profit-pill {
+      color: #3fb950 !important;
+    }
+
     .add-task-btn {
       width: 100%;
       padding: 16px;
@@ -183,19 +203,10 @@
       gap: 8px;
       cursor: pointer;
       margin-top: 6px;
+      margin-bottom: 16px;
     }
 
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(11, 14, 20, 0) 0%, rgba(11, 14, 20, 0.95) 30%, #0b0e14 100%);
-      z-index: 100;
-    }
-
-    .submit-btn {
+    .save-settings-btn {
       width: 100%;
       padding: 16px;
       background: #2ea043;
@@ -208,6 +219,125 @@
       box-shadow: 0 4px 20px var(--accent-glow);
     }
 
+    /* Карточки предложений / сделок */
+    .deal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .deal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(46, 160, 67, 0.15);
+      color: #3fb950;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .deal-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .deal-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .deal-market {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .btn-avito {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #388bfd;
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      width: 100%;
+    }
+
+    /* Таблицы аналитики */
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .stat-header {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    /* Нижний таббар (Bottom Navigation) */
+    .tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(65px + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(13, 17, 23, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 900;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .tab-btn.active {
+      color: #388bfd;
+    }
+
+    .tab-icon {
+      font-size: 19px;
+    }
+
+    .tab-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* Модалка добавления */
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -351,33 +481,89 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 14px var(--accent-glow);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-title">
-      <h1>Avito Tracker</h1>
-      <p id="subTitle">Загрузка...</p>
-    </div>
-    <div class="pulse-badge">
-      <div class="pulse-dot"></div>
-      Онлайн
-    </div>
-  </header>
+  <!-- Вкладка 1: Поиски -->
+  <div id="tab-tasks" class="tab-content active">
+    <header>
+      <div class="header-title">
+        <h1>Avito Tracker</h1>
+        <p id="subTitle">Загрузка задач...</p>
+      </div>
+      <div class="pulse-badge">
+        <div class="pulse-dot"></div>
+        Онлайн
+      </div>
+    </header>
 
-  <div class="task-list" id="taskList"></div>
+    <div class="task-list" id="taskList"></div>
 
-  <button class="add-task-btn" id="btnOpenAdd">
-    <span>➕</span> Добавить телефон и город
-  </button>
+    <button class="add-task-btn" id="btnOpenAdd">
+      <span>➕</span> Добавить телефон и город
+    </button>
 
-  <div class="bottom-bar">
-    <button class="submit-btn" id="btnSubmit">СОХРАНИТЬ И ПРИМЕНИТЬ</button>
+    <button class="save-settings-btn" id="btnSubmit">
+      СОХРАНИТЬ И ПРИМЕНИТЬ
+    </button>
   </div>
 
+  <!-- Вкладка 2: Лучшие сделки -->
+  <div id="tab-deals" class="tab-content">
+    <header>
+      <div class="header-title">
+        <h1>Лучшие сделки</h1>
+        <p>Объявления ниже рынка</p>
+      </div>
+    </header>
+    <div id="dealsList"></div>
+  </div>
+
+  <!-- Вкладка 3: Избранное -->
+  <div id="tab-favorites" class="tab-content">
+    <header>
+      <div class="header-title">
+        <h1>⭐ Избранное</h1>
+        <p>Сохраненные объявления</p>
+      </div>
+    </header>
+    <div id="favoritesList"></div>
+  </div>
+
+  <!-- Вкладка 4: Аналитика рынка -->
+  <div id="tab-analytics" class="tab-content">
+    <header>
+      <div class="header-title">
+        <h1>📊 Аналитика цен</h1>
+        <p>Медиана и вилки по регионам</p>
+      </div>
+    </header>
+    <div id="analyticsList"></div>
+  </div>
+
+  <!-- Нижний таббар -->
+  <nav class="tabbar">
+    <button class="tab-btn active" onclick="switchTab('tasks')">
+      <span class="tab-icon">⚙️</span>
+      <span class="tab-label">Поиски</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('deals')">
+      <span class="tab-icon">🔥</span>
+      <span class="tab-label">Сделки</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('favorites')">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-label">Избранное</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('analytics')">
+      <span class="tab-icon">📊</span>
+      <span class="tab-label">Рынок</span>
+    </button>
+  </nav>
+
+  <!-- Модальное окно добавления/редактирования -->
   <div class="modal-backdrop" id="modal">
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
@@ -414,11 +600,11 @@
       <div class="input-row">
         <div class="form-group">
           <label>Мин. цена (₽)</label>
-          <input type="number" id="inputMin" class="form-input" placeholder="20000">
+          <input type="number" id="inputMin" class="form-input" placeholder="10000">
         </div>
         <div class="form-group">
           <label>Макс. цена (₽)</label>
-          <input type="number" id="inputMax" class="form-input" placeholder="95000">
+          <input type="number" id="inputMax" class="form-input" placeholder="85000">
         </div>
       </div>
 
@@ -448,13 +634,14 @@
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          const fetchedNames = data.map(c => c.name);
-          ALL_CITIES = Array.from(new Set([...ALL_CITIES, ...fetchedNames]));
+          const names = data.map(c => c.name);
+          ALL_CITIES = Array.from(new Set([...ALL_CITIES, ...names]));
         }
       })
       .catch(() => {});
 
     let tasks = [];
+    let favorites = JSON.parse(localStorage.getItem("avito_favs") || "[]");
     let editTaskId = null;
 
     function safeDecode(b64) {
@@ -512,12 +699,33 @@
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
       renderTasks();
+      renderDeals();
+      renderFavorites();
+      renderAnalytics();
     }
 
     function formatPrice(num) {
       if (!num || num <= 0) return "—";
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
     }
+
+    // Переключение вкладок
+    window.switchTab = function(tabName) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+
+      const target = document.getElementById("tab-" + tabName);
+      if (target) target.classList.add("active");
+
+      const btns = document.querySelectorAll(".tab-btn");
+      const order = ["tasks", "deals", "favorites", "analytics"];
+      const idx = order.indexOf(tabName);
+      if (idx !== -1 && btns[idx]) btns[idx].classList.add("active");
+
+      if (tabName === "deals") renderDeals();
+      if (tabName === "favorites") renderFavorites();
+      if (tabName === "analytics") renderAnalytics();
+    };
 
     function renderTasks() {
       const container = document.getElementById("taskList");
@@ -558,16 +766,136 @@
       });
     }
 
-    function submitTasks() {
+    // Вкладка «Сделки»
+    function renderDeals() {
+      const container = document.getElementById("dealsList");
+      container.innerHTML = "";
+
+      if (tasks.length === 0) {
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Сначала добавьте задачи во вкладке «Поиски».</div>`;
+        return;
+      }
+
+      let count = 0;
+      tasks.forEach(t => {
+        if (!t.avg_price || t.avg_price <= 0) return;
+        count++;
+        const goodPrice = Math.round(t.avg_price * 0.82);
+        const profit = t.avg_price - goodPrice;
+
+        const card = document.createElement("div");
+        card.className = "deal-card";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="deal-badge">🔥 Выгода ~${formatPrice(profit)}</div>
+            <span style="font-size:12px; color:var(--text-muted);">📍 ${t.city}</span>
+          </div>
+          <div style="font-size:16px; font-weight:700;">${t.model}</div>
+          <div class="deal-price-row">
+            <div>
+              <span class="deal-price">${formatPrice(goodPrice)}</span>
+              <span style="font-size:12px; color:#3fb950;">(таргет для выкупа)</span>
+            </div>
+            <div class="deal-market">рынок ~${formatPrice(t.avg_price)}</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; margin-top:4px;">
+            <a href="https://m.avito.ru" target="_blank" class="btn-avito">↗️ Искать на Авито</a>
+            <button class="icon-btn" onclick="toggleFav('${t.model}', '${t.city}', ${goodPrice})">⭐</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      if (count === 0) {
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Идет расчет рыночных цен... Загляните через минуту.</div>`;
+      }
+    }
+
+    // Вкладка «Избранное»
+    window.toggleFav = function(title, city, price) {
+      favorites.push({ id: Date.now(), title, city, price });
+      localStorage.setItem("avito_favs", JSON.stringify(favorites));
+      alert("⭐ Добавлено в Избранное!");
+    };
+
+    window.removeFav = function(id) {
+      favorites = favorites.filter(f => f.id !== id);
+      localStorage.setItem("avito_favs", JSON.stringify(favorites));
+      renderFavorites();
+    };
+
+    function renderFavorites() {
+      const container = document.getElementById("favoritesList");
+      container.innerHTML = "";
+
+      if (!favorites || favorites.length === 0) {
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">У вас пока нет сохраненных предложений. Добавляйте их из вкладки «Сделки».</div>`;
+        return;
+      }
+
+      favorites.forEach(f => {
+        const card = document.createElement("div");
+        card.className = "deal-card";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:16px; font-weight:700;">${f.title}</span>
+            <button class="icon-btn" style="color:var(--danger)" onclick="removeFav(${f.id})">🗑</button>
+          </div>
+          <div style="font-size:13px; color:var(--blue);">📍 ${f.city}</div>
+          <div class="deal-price">${formatPrice(f.price)}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Вкладка «Аналитика рынка»
+    function renderAnalytics() {
+      const container = document.getElementById("analyticsList");
+      container.innerHTML = "";
+
+      if (tasks.length === 0) {
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Нет данных для аналитики.</div>`;
+        return;
+      }
+
+      tasks.forEach(t => {
+        const avg = t.avg_price || Math.round(t.min_price + (t.max_price - t.min_price) * 0.45);
+        const buyTarget = Math.round(avg * 0.80);
+        const sellTarget = Math.round(avg * 0.98);
+
+        const card = document.createElement("div");
+        card.className = "stat-card";
+        card.innerHTML = `
+          <div class="stat-header">${t.model} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${t.city})</span></div>
+          <div class="task-meta" style="margin-top:8px;">
+            <div class="meta-box">
+              <p>Средний рынок</p>
+              <p class="market-pill">~${formatPrice(avg)}</p>
+            </div>
+            <div class="meta-box">
+              <p>Вход (выкуп)</p>
+              <p class="profit-pill">до ${formatPrice(buyTarget)}</p>
+            </div>
+            <div class="meta-box" style="grid-column: span 2; margin-top:4px;">
+              <p>Рекомендованная цена быстрой продажи</p>
+              <p style="color:#fff; font-size:13px;">${formatPrice(sellTarget)} (маржа ~${formatPrice(sellTarget - buyTarget)})</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Сохранение и передача боту
+    document.getElementById("btnSubmit").addEventListener("click", () => {
       if (!tg) {
         alert("Откройте приложение внутри Telegram");
         return;
       }
       tg.sendData(JSON.stringify(tasks));
-    }
+    });
 
-    document.getElementById("btnSubmit").addEventListener("click", submitTasks);
-
+    // Автокомплит городов
     const inputCity = document.getElementById("inputCity");
     const cityList = document.getElementById("cityList");
 
@@ -585,11 +913,8 @@
       for (let i = 0; i < ALL_CITIES.length; i++) {
         const c = ALL_CITIES[i];
         const low = c.toLowerCase();
-        if (low.startsWith(val)) {
-          startsWith.push(c);
-        } else if (low.includes(val)) {
-          contains.push(c);
-        }
+        if (low.startsWith(val)) startsWith.push(c);
+        else if (low.includes(val)) contains.push(c);
         if (startsWith.length + contains.length > 25) break;
       }
 
@@ -619,6 +944,7 @@
       }
     });
 
+    // Модальное окно
     const modal = document.getElementById("modal");
     const btnOpenAdd = document.getElementById("btnOpenAdd");
     const btnCancel = document.getElementById("btnCancel");
@@ -635,9 +961,7 @@
       modal.classList.add("active");
     });
 
-    btnCancel.addEventListener("click", () => {
-      modal.classList.remove("active");
-    });
+    btnCancel.addEventListener("click", () => modal.classList.remove("active"));
 
     window.openEdit = function(id) {
       const task = tasks.find(x => String(x.id) === String(id));
@@ -646,8 +970,8 @@
       document.getElementById("modalTitle").innerText = "Редактирование";
       document.getElementById("selectModel").value = task.model || "iPhone 14 Pro";
       document.getElementById("inputCity").value = task.city || "Кемерово";
-      document.getElementById("inputMin").value = task.min_price || 20000;
-      document.getElementById("inputMax").value = task.max_price || 100000;
+      document.getElementById("inputMin").value = task.min_price || 10000;
+      document.getElementById("inputMax").value = task.max_price || 90000;
       cityList.style.display = "none";
       modal.classList.add("active");
     };
@@ -656,6 +980,8 @@
       tasks = tasks.filter(x => String(x.id) !== String(id));
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
       renderTasks();
+      renderDeals();
+      renderAnalytics();
     };
 
     btnSave.addEventListener("click", () => {
@@ -686,6 +1012,8 @@
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
       modal.classList.remove("active");
       renderTasks();
+      renderDeals();
+      renderAnalytics();
     });
 
     initData();
