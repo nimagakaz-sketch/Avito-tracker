@@ -15,6 +15,7 @@
       --button-text: var(--tg-theme-button-text-color, #ffffff);
       --danger-color: #e53935;
       --card-border: rgba(255, 255, 255, 0.08);
+      --accent-color: #2ea043;
     }
 
     * {
@@ -33,7 +34,7 @@
     }
 
     h2 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       margin-bottom: 12px;
     }
@@ -43,29 +44,25 @@
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     .input-group {
       margin-bottom: 12px;
     }
 
-    .input-group:last-child {
-      margin-bottom: 0;
-    }
-
     label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--hint-color);
       margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    input {
+    input[type="text"], input[type="url"], input[type="number"] {
       width: 100%;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 10px 12px;
@@ -87,6 +84,25 @@
       flex: 1;
     }
 
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      margin-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--button-color);
+    }
+
+    .checkbox-row span {
+      font-size: 13.5px;
+    }
+
     .btn {
       width: 100%;
       background: var(--button-color);
@@ -97,10 +113,6 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
     .btn:active {
@@ -128,12 +140,23 @@
     .task-title {
       font-weight: 600;
       font-size: 15px;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .task-meta {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--hint-color);
+      line-height: 1.4;
+    }
+
+    .task-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(82, 136, 193, 0.2);
+      color: var(--button-color);
+      margin-top: 4px;
     }
 
     .del-btn {
@@ -175,7 +198,11 @@
         <input type="number" id="maxPriceInput" placeholder="180000">
       </div>
     </div>
-    <button class="btn" style="margin-top: 14px;" onclick="addTask()">Добавить в список</button>
+    <label class="checkbox-row">
+      <input type="checkbox" id="privateOnlyInput">
+      <span>Исключать магазины (только частники)</span>
+    </label>
+    <button class="btn" onclick="addTask()">Добавить в список</button>
   </div>
 
   <h2>📋 Активные поиски</h2>
@@ -186,16 +213,22 @@
     tg.ready();
     tg.expand();
 
-    let tasks = JSON.parse(localStorage.getItem("avito_tasks")) || [
-      {
-        id: 1,
-        title: "iPhone 15 Кемерово",
-        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_15-ASgBAgICA0SywA2SoO0RtMANzqs5sMENiPw3?context=H4sIAAAAAAAA_wGgAF__YTo0OntzOjk6ImZyb21fcGFnZSI7czo3OiJmaWx0ZXJzIjtzOjY6InNvdXJjZSI7czo4OiJvcmRpbmFyeSI7czoxMjoic291cmNlX3F1ZXJ5IjtzOjk6ImlwaG9uZSAxNSI7czo1OiJ4X3NndCI7czo0MDoiZTZiYTU1YWZjMWNjMTY1MGM4ZWUyNzNkOGFlZWFkMzY5OThhZjgzNCI7fRH9b0ugAAAA&geoCoords=55.354968%2C86.087314&presentationType=serp&radius=0&s=104",
-        min_price: 25000,
-        max_price: 180000,
-        avg_price: 42768
+    let tasks = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('data');
+
+    if (dataParam) {
+      try {
+        tasks = JSON.parse(decodeURIComponent(escape(atob(dataParam))));
+        localStorage.setItem("avito_tasks", JSON.stringify(tasks));
+      } catch (e) {
+        console.error("Ошибка парсинга:", e);
       }
-    ];
+    }
+
+    if (!tasks || tasks.length === 0) {
+      tasks = JSON.parse(localStorage.getItem("avito_tasks")) || [];
+    }
 
     function renderTasks() {
       const container = document.getElementById("tasksList");
@@ -209,10 +242,14 @@
       tasks.forEach((t) => {
         const item = document.createElement("div");
         item.className = "task-item";
+        const avgText = t.avg_price ? ` • Рынок: ~${t.avg_price.toLocaleString('ru-RU')} ₽` : '';
         item.innerHTML = `
           <div class="task-info">
             <div class="task-title">${t.title}</div>
-            <div class="task-meta">Диапазон: ${t.min_price?.toLocaleString('ru-RU')} – ${t.max_price?.toLocaleString('ru-RU')} ₽</div>
+            <div class="task-meta">
+              ${t.min_price?.toLocaleString('ru-RU')} – ${t.max_price?.toLocaleString('ru-RU')} ₽${avgText}
+            </div>
+            ${t.private_only ? '<span class="task-badge">Только частники</span>' : ''}
           </div>
           <button class="del-btn" onclick="removeTask(${t.id})">✕</button>
         `;
@@ -228,9 +265,10 @@
       const url = document.getElementById("urlInput").value.trim();
       const min_p = parseInt(document.getElementById("minPriceInput").value) || 10000;
       const max_p = parseInt(document.getElementById("maxPriceInput").value) || 250000;
+      const private_only = document.getElementById("privateOnlyInput").checked;
 
       if (!title || !url) {
-        tg.showAlert("Заполните название и вставьте ссылку!");
+        tg.showAlert("Заполните название и ссылку!");
         return;
       }
 
@@ -240,6 +278,7 @@
         url: url,
         min_price: min_p,
         max_price: max_p,
+        private_only: private_only,
         avg_price: 0
       };
 
@@ -248,6 +287,7 @@
 
       document.getElementById("titleInput").value = "";
       document.getElementById("urlInput").value = "";
+      document.getElementById("privateOnlyInput").checked = false;
       renderTasks();
     }
 
