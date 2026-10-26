@@ -409,7 +409,6 @@
       tg.expand();
     }
 
-    // Базовый список ключевых городов (пополняется динамически)
     let ALL_CITIES = [
       "Россия", "Кузбасс (область)", "Кемерово", "Новокузнецк", "Прокопьевск", "Ленинск-Кузнецкий", 
       "Белово", "Междуреченск", "Юрга", "Анжеро-Судженск", "Киселевск", "Осинники", "Березовский",
@@ -418,7 +417,6 @@
       "Ростов-на-Дону", "Краснодар", "Воронеж", "Пермь", "Волгоград", "Саратов", "Владивосток", "Хабаровск"
     ];
 
-    // Фоновая загрузка полного списка городов России (~1100 городов)
     fetch("https://raw.githubusercontent.com/pensnarik/russian-cities/master/russian-cities.json")
       .then(res => res.json())
       .then(data => {
@@ -429,12 +427,7 @@
       })
       .catch(() => {});
 
-    let tasks = [
-      { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
-      { id: "2", model: "iPhone 15", city: "Кемерово", min_price: 30000, max_price: 85000, avg_price: 64490 },
-      { id: "3", model: "iPhone 11", city: "Кемерово", min_price: 7000, max_price: 22000, avg_price: 9443 },
-      { id: "4", model: "iPhone 14 Pro", city: "Кемерово", min_price: 40000, max_price: 95000, avg_price: 64750 }
-    ];
+    let tasks = [];
 
     let editTaskId = null;
 
@@ -450,24 +443,40 @@
 
     function initData() {
       try {
-        const params = new URLSearchParams(window.location.search);
-        const encoded = params.get("data");
+        const urlParams = new URLSearchParams(window.location.search);
+        let encoded = urlParams.get("data");
+
+        if (!encoded && window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          encoded = hashParams.get("data");
+        }
+
         if (encoded) {
           const payload = JSON.parse(safeBase64Decode(encoded));
           if (Array.isArray(payload) && payload.length > 0) {
-            tasks = payload.map(t => ({
-              id: String(t.id || Date.now()),
-              model: t.model || t.title || "iPhone",
-              city: t.city || "Кемерово",
-              min_price: t.min_price || 10000,
-              max_price: t.max_price || 100000,
-              avg_price: t.avg_price || 0
+            tasks = payload.map((t, idx) => ({
+              id: String(t.id || idx + 1),
+              model: t.m || t.model || t.title || "iPhone",
+              city: t.c || t.city || "Кемерово",
+              min_price: t.min || t.min_price || 10000,
+              max_price: t.max || t.max_price || 100000,
+              avg_price: t.avg || t.avg_price || 0
             }));
           }
         }
       } catch (e) {
         console.error("Data error", e);
       }
+
+      if (!tasks || tasks.length === 0) {
+        tasks = [
+          { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
+          { id: "2", model: "iPhone 15", city: "Кемерово", min_price: 30000, max_price: 85000, avg_price: 64490 },
+          { id: "3", model: "iPhone 11", city: "Кемерово", min_price: 7000, max_price: 22000, avg_price: 9443 },
+          { id: "4", model: "iPhone 14 Pro", city: "Кемерово", min_price: 40000, max_price: 95000, avg_price: 64750 }
+        ];
+      }
+
       renderTasks();
       updateMainButton();
     }
@@ -525,7 +534,6 @@
       });
     }
 
-    // Умный поиск города с сортировкой по релевантности
     const inputCity = document.getElementById("inputCity");
     const cityList = document.getElementById("cityList");
 
@@ -537,7 +545,6 @@
         return;
       }
 
-      // Сначала те, которые начинаются на введенные буквы, затем остальные совпадения
       const startsWith = [];
       const contains = [];
 
