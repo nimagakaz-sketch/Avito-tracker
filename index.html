@@ -3,579 +3,481 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Avito Radar</title>
+  <title>Управление поисками</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: #0d1117;
-      --card-bg: rgba(22, 27, 34, 0.75);
+      --bg: var(--tg-theme-bg-color, #0f1115);
+      --secondary-bg: var(--tg-theme-secondary-bg-color, #1a1d24);
+      --text: var(--tg-theme-text-color, #f5f5f7);
+      --hint: var(--tg-theme-hint-color, #86868b);
+      --accent: var(--tg-theme-button-color, #0071e3);
+      --accent-text: var(--tg-theme-button-text-color, #ffffff);
+      --card-bg: rgba(28, 31, 38, 0.72);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-active-border: rgba(56, 139, 253, 0.35);
-      --text-main: #f0f6fc;
-      --text-muted: #8b949e;
-      --accent: #2f81f7;
-      --accent-gradient: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
-      --danger: #f85149;
-      --danger-bg: rgba(248, 81, 73, 0.12);
-      --warning: #d29922;
-      --warning-bg: rgba(210, 153, 34, 0.15);
+      --glass-blur: blur(20px);
+      --green: #30d158;
+      --green-bg: rgba(48, 209, 88, 0.15);
+      --chip-bg: rgba(255, 255, 255, 0.06);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Helvetica, Arial, sans-serif;
       background-color: var(--bg);
-      color: var(--text-main);
-      padding: 16px 16px 85px 16px;
-      font-size: 14.5px;
-      min-height: 100vh;
-      background-image: radial-gradient(circle at 50% 0%, rgba(47, 129, 247, 0.12) 0%, transparent 60%);
+      color: var(--text);
+      padding: 16px 16px 100px 16px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 0 4px;
+    /* Шапка */
+    .header {
+      padding: 8px 4px 20px 4px;
     }
-
-    .app-title {
-      font-size: 21px;
+    .header h1 {
+      font-size: 26px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      background: rgba(35, 134, 54, 0.15);
-      border: 1px solid rgba(35, 134, 54, 0.3);
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #3fb950;
-    }
-
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #3fb950;
-      box-shadow: 0 0 8px #3fb950;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    .glass-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .section-title {
+    .header p {
       font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 12px;
+      color: var(--hint);
+      margin-top: 4px;
+    }
+
+    /* Список карточек */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Карточка задачи */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.15s ease, border-color 0.2s ease;
+    }
+    .card:active {
+      transform: scale(0.99);
+    }
+
+    .card-header {
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-
-    .chips-row {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-      scrollbar-width: none;
-    }
-
-    .chips-row::-webkit-scrollbar { display: none; }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12.5px;
-      white-space: nowrap;
       cursor: pointer;
-      color: var(--text-muted);
     }
 
-    .chip:active {
-      transform: scale(0.95);
-      background: rgba(47, 129, 247, 0.2);
-      color: var(--text-main);
-    }
-
-    .field {
-      margin-bottom: 12px;
-    }
-
-    .field label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    input[type="text"], input[type="url"], input[type="number"] {
-      width: 100%;
-      background: rgba(13, 17, 23, 0.7);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 11px 14px;
-      color: var(--text-main);
-      font-size: 14.5px;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .title-area {
+      display: flex;
+      align-items: center;
       gap: 10px;
     }
 
+    /* Пульсирующая точка онлайна */
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      position: relative;
+    }
+    .live-dot::after {
+      content: "";
+      position: absolute;
+      top: -3px; left: -3px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1px solid var(--green);
+      animation: pulse 2s infinite ease-out;
+      opacity: 0;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.5); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .task-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    /* Бейджи */
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 16px 14px 16px;
+    }
+    .badge {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--chip-bg);
+      color: var(--hint);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge.price {
+      background: var(--green-bg);
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Выпадающая панель редактирования (аккордеон) */
+    .card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      border-top: 1px solid transparent;
+      padding: 0 16px;
+    }
+    .card.expanded .card-body {
+      max-height: 500px;
+      border-top-color: var(--card-border);
+      padding: 16px 16px 20px 16px;
+    }
+
+    /* Поля ввода в стиле iOS Grouped Table */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--hint);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .input-box {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+    .input-box:focus {
+      border-color: var(--accent);
+    }
+
+    /* iOS Toggle Switch */
     .toggle-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 10px 0 4px 0;
-      cursor: pointer;
+      justify-content: space-between;
+      padding: 8px 0;
     }
-
     .toggle-label {
-      font-size: 13.5px;
+      font-size: 15px;
       font-weight: 500;
     }
-
-    .toggle-sub {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
     .switch {
       position: relative;
       display: inline-block;
-      width: 44px;
-      height: 26px;
-      flex-shrink: 0;
+      width: 48px;
+      height: 28px;
     }
-
-    .switch input { opacity: 0; width: 0; height: 0; }
-
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
     .slider {
       position: absolute;
       cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
       background-color: rgba(255, 255, 255, 0.15);
-      border-radius: 34px;
-      transition: 0.3s;
+      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 28px;
     }
-
     .slider:before {
       position: absolute;
       content: "";
-      height: 20px;
-      width: 20px;
+      height: 22px;
+      width: 22px;
       left: 3px;
       bottom: 3px;
       background-color: white;
+      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 50%;
-      transition: 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    input:checked + .slider {
+      background-color: var(--green);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
     }
 
-    input:checked + .slider { background-color: #3fb950; }
-    input:checked + .slider:before { transform: translateX(18px); }
-
-    .btn-row {
+    /* Кнопки управления карточкой */
+    .actions {
       display: flex;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 16px;
     }
-
-    .submit-btn {
+    .btn-secondary {
       flex: 1;
-      background: var(--accent-gradient);
-      color: #fff;
+      background: var(--chip-bg);
       border: none;
-      border-radius: 11px;
-      padding: 12px;
-      font-size: 14.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .cancel-btn {
-      display: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-      border-radius: 11px;
-      padding: 12px 16px;
-      font-size: 14.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .submit-btn:active, .cancel-btn:active {
-      transform: scale(0.98);
-    }
-
-    .task-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 10px;
       border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-    }
-
-    .task-card:last-child { margin-bottom: 0; }
-
-    .task-main {
-      flex: 1;
-      padding-right: 10px;
-    }
-
-    .task-name {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
-      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: rgba(255, 69, 58, 0.15);
+      color: #ff453a;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .task-details {
+    /* Фиксированная нижняя панель сохранения */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(15, 17, 21, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid var(--card-border);
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
+      gap: 10px;
+      z-index: 99;
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .pill-price { background: rgba(47, 129, 247, 0.12); color: #58a6ff; }
-    .pill-market { background: rgba(35, 134, 54, 0.15); color: #3fb950; }
-    .pill-private { background: rgba(163, 113, 247, 0.15); color: #bc8cff; }
-
-    .actions-box {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .icon-btn {
-      width: 32px;
-      height: 32px;
+    .btn-primary {
+      flex: 1;
+      background: var(--accent);
+      color: var(--accent-text);
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      gap: 6px;
+      transition: transform 0.1s ease, filter 0.2s ease;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+      filter: brightness(0.9);
+    }
+
+    .btn-add {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      border: 1px solid transparent;
-      font-size: 14px;
     }
-
-    .edit-btn {
-      background: var(--warning-bg);
-      border-color: rgba(210, 153, 34, 0.3);
-      color: var(--warning);
-    }
-
-    .delete-btn {
-      background: var(--danger-bg);
-      border-color: rgba(248, 81, 73, 0.2);
-      color: var(--danger);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 24px 10px;
-      color: var(--text-muted);
-      font-size: 13.5px;
+    .btn-add:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
 
-  <div class="header-bar">
-    <div class="app-title">Avito Radar</div>
-    <div class="status-badge">
-      <span class="pulse-dot"></span>
-      <span>Слежка активна</span>
-    </div>
+  <div class="header">
+    <h1>Активные поиски</h1>
+    <p>Мониторинг предложений в реальном времени</p>
   </div>
 
-  <div class="chips-row">
-    <div class="chip" onclick="applyPreset('iPhone 15')">📱 iPhone 15</div>
-    <div class="chip" onclick="applyPreset('iPhone 14 Pro')">📱 iPhone 14 Pro</div>
-    <div class="chip" onclick="applyPreset('iPhone 13')">📱 iPhone 13</div>
-    <div class="chip" onclick="applyPreset('AirPods Pro 2')">🎧 AirPods Pro 2</div>
+  <div class="task-list" id="taskList"></div>
+
+  <div class="bottom-bar">
+    <button class="btn-add" id="addBtn">＋</button>
+    <button class="btn-primary" id="saveBtn">💾 Сохранить и применить</button>
   </div>
-
-  <div class="glass-card">
-    <div class="section-title">
-      <span id="formTitle">Новый трекинг</span>
-    </div>
-    
-    <input type="hidden" id="editingTaskId" value="">
-
-    <div class="field">
-      <label>НАЗВАНИЕ МОДЕЛИ</label>
-      <input type="text" id="titleInput" placeholder="Например: iPhone 15 128GB">
-    </div>
-
-    <div class="field">
-      <label>ССЫЛКА НА M.AVITO.RU</label>
-      <input type="url" id="urlInput" placeholder="https://m.avito.ru/...">
-    </div>
-
-    <div class="grid-2">
-      <div class="field">
-        <label>МИН. ЦЕНА (₽)</label>
-        <input type="number" id="minPriceInput" placeholder="25 000">
-      </div>
-      <div class="field">
-        <label>МАКС. ЦЕНА (₽)</label>
-        <input type="number" id="maxPriceInput" placeholder="180 000">
-      </div>
-    </div>
-
-    <div class="toggle-row" onclick="togglePrivate()">
-      <div>
-        <div class="toggle-label">Только частники</div>
-        <div class="toggle-sub">Исключать магазины и скупки</div>
-      </div>
-      <label class="switch" onclick="event.stopPropagation()">
-        <input type="checkbox" id="privateOnlyInput" onchange="haptic()">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="btn-row">
-      <button class="submit-btn" id="submitBtn" onclick="saveTaskForm()">Добавить в радар</button>
-      <button class="cancel-btn" id="cancelBtn" onclick="resetForm()">Отмена</button>
-    </div>
-  </div>
-
-  <div class="section-title" style="padding: 0 4px;">Отслеживаемые категории (<span id="taskCount">0</span>)</div>
-  <div class="glass-card" id="tasksList" style="padding: 10px;"></div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
+    // Хелпер тактильного отклика iOS
     function haptic(type = 'light') {
-      if (tg.HapticFeedback) {
-        if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
-        else tg.HapticFeedback.impactOccurred(type);
+      if (tg?.HapticFeedback) {
+        if (type === 'success' || type === 'warning' || type === 'error') {
+          tg.HapticFeedback.notificationOccurred(type);
+        } else {
+          tg.HapticFeedback.impactOccurred(type);
+        }
       }
     }
 
+    // Загрузка начальных данных из URL (?data=base64)
     let tasks = [];
     const urlParams = new URLSearchParams(window.location.search);
     const dataParam = urlParams.get('data');
-
     if (dataParam) {
       try {
-        tasks = JSON.parse(decodeURIComponent(escape(atob(dataParam))));
-        localStorage.setItem("avito_tasks", JSON.stringify(tasks));
+        const decoded = decodeURIComponent(escape(atob(dataParam)));
+        tasks = JSON.parse(decoded);
       } catch (e) {
-        console.error("Ошибка парсинга:", e);
+        console.error('Ошибка декодирования данных:', e);
       }
     }
 
-    if (!tasks || tasks.length === 0) {
-      tasks = JSON.parse(localStorage.getItem("avito_tasks")) || [];
-    }
-
-    function applyPreset(name) {
-      haptic('light');
-      document.getElementById('titleInput').value = `${name} Кемерово`;
-    }
-
-    function togglePrivate() {
-      const el = document.getElementById("privateOnlyInput");
-      el.checked = !el.checked;
-      haptic('light');
-    }
+    const taskListEl = document.getElementById('taskList');
 
     function renderTasks() {
-      const container = document.getElementById("tasksList");
-      const countEl = document.getElementById("taskCount");
-      countEl.innerText = tasks.length;
-      container.innerHTML = "";
+      taskListEl.innerHTML = '';
+      tasks.forEach((t, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${index}`;
 
-      if (tasks.length === 0) {
-        container.innerHTML = '<div class="empty-state">Нет активных отслеживаний.<br>Добавьте первый поиск выше.</div>';
-        tg.MainButton.hide();
-        return;
-      }
+        const avgPrice = t.avg_price ? `~${Number(t.avg_price).toLocaleString('ru-RU')} ₽` : 'расчет...';
+        const sellerBadge = t.private_only ? '👤 Только частники' : '🏢 Все продавцы';
 
-      tasks.forEach((t) => {
-        const item = document.createElement("div");
-        item.className = "task-card";
-        
-        let badgesHtml = `<span class="pill pill-price">${t.min_price?.toLocaleString('ru-RU')} – ${t.max_price?.toLocaleString('ru-RU')} ₽</span>`;
-        if (t.avg_price && t.avg_price > 0) {
-          badgesHtml += `<span class="pill pill-market">~${t.avg_price.toLocaleString('ru-RU')} ₽</span>`;
-        }
-        if (t.private_only) {
-          badgesHtml += `<span class="pill pill-private">👤 Частники</span>`;
-        }
-
-        item.innerHTML = `
-          <div class="task-main">
-            <div class="task-name">${t.title}</div>
-            <div class="task-details">${badgesHtml}</div>
+        card.innerHTML = `
+          <div class="card-header" onclick="toggleExpand(${index})">
+            <div class="title-area">
+              <span class="live-dot"></span>
+              <span class="task-title">${t.title || 'Поиск без названия'}</span>
+            </div>
+            <span style="color: var(--hint); font-size: 18px;">⌄</span>
           </div>
-          <div class="actions-box">
-            <button class="icon-btn edit-btn" onclick="startEdit(${t.id})">✏️</button>
-            <button class="icon-btn delete-btn" onclick="removeTask(${t.id})">✕</button>
+
+          <div class="badges-row">
+            <span class="badge price">📊 ${avgPrice}</span>
+            <span class="badge">💰 ${Number(t.min_price || 0).toLocaleString('ru-RU')} – ${Number(t.max_price || 0).toLocaleString('ru-RU')} ₽</span>
+            <span class="badge">${sellerBadge}</span>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label>Название</label>
+              <input class="input-box" type="text" value="${t.title || ''}" oninput="updateField(${index}, 'title', this.value)">
+            </div>
+
+            <div class="form-group">
+              <label>Диапазон цены (₽)</label>
+              <div class="input-row">
+                <input class="input-box" type="number" placeholder="От" value="${t.min_price || ''}" oninput="updateField(${index}, 'min_price', Number(this.value))">
+                <input class="input-box" type="number" placeholder="До" value="${t.max_price || ''}" oninput="updateField(${index}, 'max_price', Number(this.value))">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Ссылка на поиск Авито</label>
+              <input class="input-box" type="text" value="${t.url || ''}" oninput="updateField(${index}, 'url', this.value)">
+            </div>
+
+            <div class="toggle-row">
+              <span class="toggle-label">Только частные продавцы</span>
+              <label class="switch">
+                <input type="checkbox" ${t.private_only ? 'checked' : ''} onchange="togglePrivate(${index}, this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="btn-danger" onclick="deleteTask(${index})">Удалить</button>
+              <button class="btn-secondary" onclick="toggleExpand(${index})">Свернуть</button>
+            </div>
           </div>
         `;
-        container.appendChild(item);
+        taskListEl.appendChild(card);
       });
-
-      tg.MainButton.text = "💾 Сохранить и применить";
-      tg.MainButton.textColor = "#ffffff";
-      tg.MainButton.color = "#2f81f7";
-      tg.MainButton.show();
     }
 
-    function startEdit(id) {
-      haptic('medium');
-      const task = tasks.find(t => t.id === id);
-      if (!task) return;
-
-      document.getElementById('editingTaskId').value = task.id;
-      document.getElementById('titleInput').value = task.title;
-      document.getElementById('urlInput').value = task.url;
-      document.getElementById('minPriceInput').value = task.min_price;
-      document.getElementById('maxPriceInput').value = task.max_price;
-      document.getElementById('privateOnlyInput').checked = !!task.private_only;
-
-      document.getElementById('formTitle').innerText = 'Редактирование задачи';
-      document.getElementById('submitBtn').innerText = 'Обновить параметры';
-      document.getElementById('cancelBtn').style.display = 'block';
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function resetForm() {
-      document.getElementById('editingTaskId').value = '';
-      document.getElementById('titleInput').value = '';
-      document.getElementById('urlInput').value = '';
-      document.getElementById('minPriceInput').value = '';
-      document.getElementById('maxPriceInput').value = '';
-      document.getElementById('privateOnlyInput').checked = false;
-
-      document.getElementById('formTitle').innerText = 'Новый трекинг';
-      document.getElementById('submitBtn').innerText = 'Добавить в радар';
-      document.getElementById('cancelBtn').style.display = 'none';
+    function toggleExpand(index) {
       haptic('light');
+      const card = document.getElementById(`card-${index}`);
+      card.classList.toggle('expanded');
     }
 
-    function saveTaskForm() {
-      const editId = document.getElementById('editingTaskId').value;
-      const title = document.getElementById('titleInput').value.trim();
-      const url = document.getElementById('urlInput').value.trim();
-      const min_p = parseInt(document.getElementById('minPriceInput').value) || 10000;
-      const max_p = parseInt(document.getElementById('maxPriceInput').value) || 250000;
-      const private_only = document.getElementById('privateOnlyInput').checked;
+    function updateField(index, field, value) {
+      tasks[index][field] = value;
+    }
 
-      if (!title || !url) {
-        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-        tg.showAlert("Укажите название и ссылку!");
-        return;
-      }
+    function togglePrivate(index, value) {
+      haptic('light');
+      tasks[index].private_only = value;
+      renderTasks();
+      // Оставляем карточку раскрытой
+      document.getElementById(`card-${index}`)?.classList.add('expanded');
+    }
 
-      if (editId) {
-        tasks = tasks.map(t => {
-          if (String(t.id) === String(editId)) {
-            return {
-              ...t,
-              title: title,
-              url: url,
-              min_price: min_p,
-              max_price: max_p,
-              private_only: private_only
-            };
-          }
-          return t;
-        });
-        haptic('success');
-      } else {
-        const newTask = {
-          id: Date.now(),
-          title: title,
-          url: url,
-          min_price: min_p,
-          max_price: max_p,
-          private_only: private_only,
-          avg_price: 0
-        };
-        tasks.unshift(newTask);
-        haptic('medium');
-      }
-
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
-      resetForm();
+    function deleteTask(index) {
+      haptic('warning');
+      tasks.splice(index, 1);
       renderTasks();
     }
 
-    function removeTask(id) {
-      haptic('heavy');
-      tasks = tasks.filter(t => t.id !== id);
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
-      if (document.getElementById('editingTaskId').value === String(id)) {
-        resetForm();
-      }
+    document.getElementById('addBtn').addEventListener('click', () => {
+      haptic('light');
+      tasks.push({
+        id: Date.now().toString(),
+        title: 'Новый iPhone',
+        url: '',
+        min_price: 20000,
+        max_price: 80000,
+        private_only: false,
+        avg_price: 0
+      });
       renderTasks();
-    }
+      const lastIndex = tasks.length - 1;
+      setTimeout(() => {
+        document.getElementById(`card-${lastIndex}`)?.classList.add('expanded');
+      }, 50);
+    });
 
-    tg.onEvent("mainButtonClicked", function() {
+    document.getElementById('saveBtn').addEventListener('click', () => {
       haptic('success');
-      tg.sendData(JSON.stringify(tasks));
-      tg.close();
+      if (tg) {
+        tg.sendData(JSON.stringify(tasks));
+      } else {
+        alert('Данные сохранены локально (откройте в Telegram)');
+      }
     });
 
     renderTasks();
