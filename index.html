@@ -15,7 +15,6 @@
       --accent: #2ea043;
       --accent-glow: rgba(46, 160, 67, 0.35);
       --danger: #f85149;
-      --danger-glow: rgba(248, 81, 73, 0.25);
       --blue: #388bfd;
       --blue-glow: rgba(56, 139, 253, 0.2);
     }
@@ -31,7 +30,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      padding: 16px 16px 100px;
+      padding: 16px 16px 110px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -39,7 +38,7 @@
     }
 
     header {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -85,13 +84,47 @@
       100% { transform: scale(0.95); opacity: 0.7; }
     }
 
-    .task-list {
+    /* iOS Segmented Control */
+    .tabs-nav {
       display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-content {
+      display: none;
       flex-direction: column;
       gap: 12px;
     }
 
-    .task-card {
+    .tab-content.active {
+      display: flex;
+    }
+
+    .task-card, .item-card {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -101,13 +134,6 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
-      position: relative;
-    }
-
-    .task-card:active {
-      transform: scale(0.985);
-      border-color: rgba(255, 255, 255, 0.18);
     }
 
     .task-top {
@@ -133,7 +159,7 @@
       text-decoration: none;
       display: inline-block;
       margin-top: 4px;
-      max-width: 220px;
+      max-width: 210px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -156,18 +182,6 @@
       justify-content: center;
       font-size: 14px;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .icon-btn:hover, .icon-btn:active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .icon-btn.delete:active {
-      background: var(--danger-glow);
-      color: var(--danger);
-      border-color: var(--danger);
     }
 
     .task-meta {
@@ -211,24 +225,74 @@
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      margin-top: 14px;
-      transition: all 0.2s;
+      margin-top: 10px;
     }
 
-    .add-task-btn:active {
+    /* Стили карточек объявлений */
+    .item-card {
+      border-left: 3px solid #388bfd;
+      gap: 10px;
+    }
+
+    .item-card.deal {
+      border-left-color: #2ea043;
+    }
+
+    .item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .item-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #3fb950;
+    }
+
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.08);
-      border-color: var(--text);
-      color: #ffffff;
-      transform: scale(0.985);
+      color: var(--text-muted);
+    }
+
+    .badge-tag.accent {
+      background: rgba(46, 160, 67, 0.2);
+      color: #3fb950;
+    }
+
+    .item-btn {
+      margin-top: 4px;
+      padding: 10px;
+      text-align: center;
+      background: rgba(56, 139, 253, 0.15);
+      border: 1px solid rgba(56, 139, 253, 0.3);
+      color: #58a6ff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      display: block;
     }
 
     /* Modal Sheet */
     .modal-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
@@ -297,11 +361,6 @@
       font-size: 15px;
       color: #fff;
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-      border-color: var(--blue);
     }
 
     .input-row {
@@ -317,11 +376,6 @@
       padding: 10px 0;
     }
 
-    .toggle-label {
-      font-size: 15px;
-      font-weight: 500;
-    }
-
     .switch {
       position: relative;
       display: inline-block;
@@ -329,11 +383,7 @@
       height: 28px;
     }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .switch input { opacity: 0; width: 0; height: 0; }
 
     .slider {
       position: absolute;
@@ -347,22 +397,15 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 22px;
-      width: 22px;
-      left: 3px;
-      bottom: 3px;
+      height: 22px; width: 22px;
+      left: 3px; bottom: 3px;
       background-color: white;
       transition: .3s;
       border-radius: 50%;
     }
 
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(18px);
-    }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(18px); }
 
     .sheet-btns {
       display: grid;
@@ -393,19 +436,14 @@
       cursor: pointer;
       box-shadow: 0 4px 14px var(--accent-glow);
     }
-
-    .btn-primary:active {
-      transform: scale(0.98);
-      background: #2ea043;
-    }
   </style>
 </head>
 <body>
 
   <header>
     <div class="header-title">
-      <h1>Мониторинг</h1>
-      <p>Активные поиски Avito</p>
+      <h1>Avito Tracker</h1>
+      <p>Мониторинг цен в реальном времени</p>
     </div>
     <div class="pulse-badge">
       <div class="pulse-dot"></div>
@@ -413,13 +451,25 @@
     </div>
   </header>
 
-  <div class="task-list" id="taskList"></div>
+  <div class="tabs-nav">
+    <button class="tab-btn active" id="tabBtnTasks" onclick="switchTab('tasks')">⚙️ Поиски</button>
+    <button class="tab-btn" id="tabBtnItems" onclick="switchTab('items')">📱 Объявления (<span id="itemsCount">0</span>)</button>
+  </div>
 
-  <button class="add-task-btn" id="btnOpenAdd">
-    <span>➕</span> Добавить модель для отслеживания
-  </button>
+  <!-- Вкладка 1: Поиски -->
+  <div class="tab-content active" id="tabTasks">
+    <div class="task-list" id="taskList"></div>
+    <button class="add-task-btn" id="btnOpenAdd">
+      <span>➕</span> Добавить модель для отслеживания
+    </button>
+  </div>
 
-  <!-- Modal Sheet -->
+  <!-- Вкладка 2: Найденные объявления -->
+  <div class="tab-content" id="tabItems">
+    <div id="itemsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+  </div>
+
+  <!-- Модалка настройки поиска -->
   <div class="modal-backdrop" id="modal">
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
@@ -438,7 +488,7 @@
       <div class="input-row">
         <div class="form-group">
           <label>Мин. цена (₽)</label>
-          <input type="number" id="inputMin" class="form-input" placeholder="10000">
+          <input type="number" id="inputMin" class="form-input" placeholder="5000">
         </div>
         <div class="form-group">
           <label>Макс. цена (₽)</label>
@@ -447,7 +497,7 @@
       </div>
 
       <div class="toggle-row">
-        <span class="toggle-label">Только частники</span>
+        <span>Только частники</span>
         <label class="switch">
           <input type="checkbox" id="inputPrivate">
           <span class="slider"></span>
@@ -466,34 +516,61 @@
     if (tg) {
       tg.ready();
       tg.expand();
-      tg.enableClosingConfirmation();
     }
 
     let tasks = [];
+    let itemsStore = {};
     let editTaskId = null;
 
-    function haptic(type = "light") {
+    function safeBase64Decode(str) {
       try {
-        if (tg && tg.HapticFeedback) {
-          if (type === "success") tg.HapticFeedback.notificationOccurred("success");
-          else if (type === "warning") tg.HapticFeedback.notificationOccurred("warning");
-          else tg.HapticFeedback.impactOccurred(type);
-        }
-      } catch (e) {}
+        const binString = atob(str);
+        const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+        return new TextDecoder().decode(bytes);
+      } catch (e) {
+        return decodeURIComponent(escape(atob(str)));
+      }
+    }
+
+    function switchTab(tab) {
+      const btnTasks = document.getElementById("tabBtnTasks");
+      const btnItems = document.getElementById("tabBtnItems");
+      const viewTasks = document.getElementById("tabTasks");
+      const viewItems = document.getElementById("tabItems");
+
+      if (tab === "tasks") {
+        btnTasks.classList.add("active");
+        btnItems.classList.remove("active");
+        viewTasks.classList.add("active");
+        viewItems.classList.remove("active");
+        if (tg && tg.MainButton) tg.MainButton.show();
+      } else {
+        btnItems.classList.add("active");
+        btnTasks.classList.remove("active");
+        viewItems.classList.add("active");
+        viewTasks.classList.remove("active");
+        if (tg && tg.MainButton) tg.MainButton.hide();
+      }
     }
 
     function initData() {
-      const params = new URLSearchParams(window.location.search);
-      const encoded = params.get("data");
-      if (encoded) {
-        try {
-          const jsonStr = decodeURIComponent(escape(atob(encoded)));
-          tasks = JSON.parse(jsonStr);
-        } catch (e) {
-          console.error("Decode error", e);
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const encoded = params.get("data");
+        if (encoded) {
+          const payload = JSON.parse(safeBase64Decode(encoded));
+          if (Array.isArray(payload)) {
+            tasks = payload;
+          } else if (payload.tasks) {
+            tasks = payload.tasks || [];
+            itemsStore = payload.items || {};
+          }
         }
+      } catch (e) {
+        console.error("Parse data error", e);
       }
       renderTasks();
+      renderItems();
       updateMainButton();
     }
 
@@ -506,12 +583,12 @@
       const container = document.getElementById("taskList");
       container.innerHTML = "";
 
-      if (tasks.length === 0) {
+      if (!tasks || tasks.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; padding: 40px 10px; color: var(--text-muted);">
-            <div style="font-size: 38px; margin-bottom: 12px;">📱</div>
-            <div style="font-size: 16px; font-weight: 600; color: #fff;">Нет активных поисков</div>
-            <div style="font-size: 13px; margin-top: 4px;">Добавьте первую модель, чтобы бот начал пересылать новые объявления.</div>
+          <div style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+            <div style="font-size: 32px; margin-bottom: 8px;">📱</div>
+            <div style="font-size: 15px; font-weight: 600; color: #fff;">Нет активных поисков</div>
+            <div style="font-size: 12px; margin-top: 4px;">Добавьте первую модель кнопкой ниже.</div>
           </div>
         `;
         return;
@@ -528,7 +605,7 @@
             </div>
             <div class="task-actions">
               <button class="icon-btn" onclick="openEdit('${t.id}')">✏️</button>
-              <button class="icon-btn delete" onclick="deleteTask('${t.id}')">🗑</button>
+              <button class="icon-btn" style="color: var(--danger)" onclick="deleteTask('${t.id}')">🗑</button>
             </div>
           </div>
 
@@ -547,6 +624,51 @@
       });
     }
 
+    function renderItems() {
+      const container = document.getElementById("itemsList");
+      container.innerHTML = "";
+
+      let allItems = [];
+      Object.keys(itemsStore).forEach(category => {
+        (itemsStore[category] || []).forEach(it => {
+          allItems.push({ ...it, category });
+        });
+      });
+
+      document.getElementById("itemsCount").innerText = allItems.length;
+
+      if (allItems.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 10px; color: var(--text-muted);">
+            <div style="font-size: 34px; margin-bottom: 8px;">📦</div>
+            <div style="font-size: 15px; font-weight: 600; color: #fff;">Объявления пока собираются</div>
+            <div style="font-size: 12px; margin-top: 4px;">Как только парсер найдет лоты, они появятся здесь.</div>
+          </div>
+        `;
+        return;
+      }
+
+      allItems.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+        
+        let tagsHtml = `<span class="badge-tag">${item.category}</span>`;
+        if (item.memory) tagsHtml += `<span class="badge-tag accent">💾 ${item.memory}</span>`;
+        if (item.color) tagsHtml += `<span class="badge-tag">🎨 ${item.color}</span>`;
+        tagsHtml += `<span class="badge-tag">${item.is_shop ? "🏢 Магазин" : "👤 Частник"}</span>`;
+
+        card.innerHTML = `
+          <div class="item-header">
+            <div class="item-title">${item.title}</div>
+            <div class="item-price">${formatPrice(item.price)}</div>
+          </div>
+          <div class="item-tags">${tagsHtml}</div>
+          <a href="${item.url}" target="_blank" class="item-btn">↗️ Открыть объявление на Авито</a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     function updateMainButton() {
       if (!tg || !tg.MainButton) return;
       tg.MainButton.text = "СОХРАНИТЬ И ПРИМЕНИТЬ";
@@ -557,19 +679,16 @@
 
     if (tg && tg.MainButton) {
       tg.MainButton.onClick(() => {
-        haptic("success");
         tg.sendData(JSON.stringify(tasks));
       });
     }
 
-    // Modal
     const modal = document.getElementById("modal");
     const btnOpenAdd = document.getElementById("btnOpenAdd");
     const btnCancel = document.getElementById("btnCancel");
     const btnSave = document.getElementById("btnSave");
 
     btnOpenAdd.addEventListener("click", () => {
-      haptic("light");
       editTaskId = null;
       document.getElementById("modalTitle").innerText = "Новый поиск";
       document.getElementById("inputTitle").value = "";
@@ -581,12 +700,10 @@
     });
 
     btnCancel.addEventListener("click", () => {
-      haptic("light");
       modal.classList.remove("active");
     });
 
     window.openEdit = function(id) {
-      haptic("light");
       const task = tasks.find(x => String(x.id) === String(id));
       if (!task) return;
       editTaskId = id;
@@ -600,7 +717,6 @@
     };
 
     window.deleteTask = function(id) {
-      haptic("warning");
       tasks = tasks.filter(x => String(x.id) !== String(id));
       renderTasks();
     };
@@ -613,15 +729,12 @@
       const priv = document.getElementById("inputPrivate").checked;
 
       if (!title || !url) {
-        haptic("warning");
         alert("Заполните название и ссылку");
         return;
       }
 
-      // Чистим ссылку от мусорных параметров context/geoCoords
       const cleanUrl = url.split("?")[0] + "?s=104";
 
-      haptic("light");
       if (editTaskId) {
         const item = tasks.find(x => String(x.id) === String(editTaskId));
         if (item) {
