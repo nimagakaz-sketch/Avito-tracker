@@ -7,15 +7,12 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #0f1115);
-      --secondary-bg: var(--tg-theme-secondary-bg-color, #1a1d24);
-      --text: var(--tg-theme-text-color, #f5f5f7);
-      --hint: var(--tg-theme-hint-color, #86868b);
-      --accent: var(--tg-theme-button-color, #0071e3);
-      --accent-text: var(--tg-theme-button-text-color, #ffffff);
-      --card-bg: rgba(28, 31, 38, 0.72);
+      --bg: #0b0d11;
+      --card-bg: rgba(26, 29, 36, 0.7);
       --card-border: rgba(255, 255, 255, 0.08);
-      --glass-blur: blur(20px);
+      --text: #f5f5f7;
+      --hint: #86868b;
+      --accent: #2997ff;
       --green: #30d158;
       --green-bg: rgba(48, 209, 88, 0.15);
       --chip-bg: rgba(255, 255, 255, 0.06);
@@ -26,25 +23,23 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      padding: 16px 16px 100px 16px;
+      padding: 16px 16px 110px 16px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Шапка */
     .header {
-      padding: 8px 4px 20px 4px;
+      padding: 8px 4px 18px 4px;
     }
     .header h1 {
       font-size: 26px;
       font-weight: 700;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
     }
     .header p {
       font-size: 13px;
@@ -52,25 +47,20 @@
       margin-top: 4px;
     }
 
-    /* Список карточек */
     .task-list {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    /* Карточка задачи */
     .card {
       background: var(--card-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
       border-radius: 20px;
       overflow: hidden;
       transition: transform 0.15s ease, border-color 0.2s ease;
-    }
-    .card:active {
-      transform: scale(0.99);
     }
 
     .card-header {
@@ -87,7 +77,6 @@
       gap: 10px;
     }
 
-    /* Пульсирующая точка онлайна */
     .live-dot {
       width: 8px;
       height: 8px;
@@ -107,17 +96,25 @@
       opacity: 0;
     }
     @keyframes pulse {
-      0% { transform: scale(0.5); opacity: 0.8; }
+      0% { transform: scale(0.6); opacity: 0.8; }
       100% { transform: scale(1.6); opacity: 0; }
     }
 
     .task-title {
       font-size: 17px;
       font-weight: 600;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
     }
 
-    /* Бейджи */
+    .chevron {
+      color: var(--hint);
+      font-size: 15px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card.expanded .chevron {
+      transform: rotate(180deg);
+    }
+
     .badges-row {
       display: flex;
       flex-wrap: wrap;
@@ -131,9 +128,6 @@
       border-radius: 12px;
       background: var(--chip-bg);
       color: var(--hint);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }
     .badge.price {
       background: var(--green-bg);
@@ -141,7 +135,6 @@
       font-weight: 600;
     }
 
-    /* Выпадающая панель редактирования (аккордеон) */
     .card-body {
       max-height: 0;
       overflow: hidden;
@@ -150,23 +143,22 @@
       padding: 0 16px;
     }
     .card.expanded .card-body {
-      max-height: 500px;
+      max-height: 600px;
       border-top-color: var(--card-border);
       padding: 16px 16px 20px 16px;
     }
 
-    /* Поля ввода в стиле iOS Grouped Table */
     .form-group {
       margin-bottom: 12px;
     }
     .form-group label {
       display: block;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--hint);
       margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
     }
     .input-row {
       display: flex;
@@ -174,26 +166,24 @@
     }
     .input-box {
       width: 100%;
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 12px 14px;
       font-size: 15px;
       color: var(--text);
       outline: none;
-      transition: border-color 0.2s ease;
       font-family: inherit;
     }
     .input-box:focus {
       border-color: var(--accent);
     }
 
-    /* iOS Toggle Switch */
     .toggle-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 0;
+      padding: 10px 0;
     }
     .toggle-label {
       font-size: 15px;
@@ -202,7 +192,7 @@
     .switch {
       position: relative;
       display: inline-block;
-      width: 48px;
+      width: 46px;
       height: 28px;
     }
     .switch input {
@@ -215,7 +205,7 @@
       cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
       background-color: rgba(255, 255, 255, 0.15);
-      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: 0.25s ease;
       border-radius: 28px;
     }
     .slider:before {
@@ -226,18 +216,16 @@
       left: 3px;
       bottom: 3px;
       background-color: white;
-      transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: 0.25s ease;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     input:checked + .slider {
       background-color: var(--green);
     }
     input:checked + .slider:before {
-      transform: translateX(20px);
+      transform: translateX(18px);
     }
 
-    /* Кнопки управления карточкой */
     .actions {
       display: flex;
       gap: 8px;
@@ -248,7 +236,7 @@
       background: var(--chip-bg);
       border: none;
       color: var(--text);
-      padding: 10px;
+      padding: 11px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
@@ -258,33 +246,31 @@
       background: rgba(255, 69, 58, 0.15);
       color: #ff453a;
       border: none;
-      padding: 10px 14px;
+      padding: 11px 16px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
     }
 
-    /* Фиксированная нижняя панель сохранения */
     .bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-      background: rgba(15, 17, 21, 0.85);
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      background: rgba(11, 13, 17, 0.85);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-top: 1px solid var(--card-border);
       display: flex;
       gap: 10px;
-      z-index: 99;
+      z-index: 100;
     }
-
     .btn-primary {
       flex: 1;
       background: var(--accent);
-      color: var(--accent-text);
+      color: #fff;
       border: none;
       padding: 14px;
       border-radius: 14px;
@@ -295,13 +281,10 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transition: transform 0.1s ease, filter 0.2s ease;
     }
     .btn-primary:active {
       transform: scale(0.98);
-      filter: brightness(0.9);
     }
-
     .btn-add {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -309,14 +292,11 @@
       width: 48px;
       height: 48px;
       border-radius: 14px;
-      font-size: 20px;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-    }
-    .btn-add:active {
-      transform: scale(0.95);
     }
   </style>
 </head>
@@ -341,7 +321,6 @@
       tg.expand();
     }
 
-    // Хелпер тактильного отклика iOS
     function haptic(type = 'light') {
       if (tg?.HapticFeedback) {
         if (type === 'success' || type === 'warning' || type === 'error') {
@@ -352,17 +331,61 @@
       }
     }
 
-    // Загрузка начальных данных из URL (?data=base64)
+    // Безопасное декодирование UTF-8 Base64
+    function safeB64Decode(str) {
+      try {
+        const binString = atob(str);
+        const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+        return JSON.parse(new TextDecoder().decode(bytes));
+      } catch (e) {
+        console.warn('UTF-8 decode fallback to standard escape/unescape', e);
+        return JSON.parse(decodeURIComponent(escape(atob(str))));
+      }
+    }
+
     let tasks = [];
     const urlParams = new URLSearchParams(window.location.search);
     const dataParam = urlParams.get('data');
+
     if (dataParam) {
       try {
-        const decoded = decodeURIComponent(escape(atob(dataParam)));
-        tasks = JSON.parse(decoded);
+        tasks = safeB64Decode(dataParam);
+        localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
       } catch (e) {
-        console.error('Ошибка декодирования данных:', e);
+        console.error('Ошибка разбора данных из URL:', e);
       }
+    }
+
+    // Если параметров не было, читаем сохранённое в кэше
+    if (!tasks || tasks.length === 0) {
+      try {
+        const local = localStorage.getItem('cached_avito_tasks');
+        if (local) tasks = JSON.parse(local);
+      } catch (e) {}
+    }
+
+    // Запасной дефолтный список, если открыто в первый раз абсолютно чисто
+    if (!tasks || tasks.length === 0) {
+      tasks = [
+        {
+          id: "1",
+          title: "iPhone 13",
+          url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_13-ASgBAgICA0SywA3svcgBtMANzqs5sMENiPw3?context=H4sIAAAAAAAA_wG5AEb_YTo1OntzOjk6ImZyb21fcGFnZSI7czo3OiJmaWx0ZXJzIjtzOjE0OiJoYXNFeHRyYVBhcmFtcyI7YjoxO3M6Njoic291cmNlIjtzOjc6Imhpc3RvcnkiO3M6MTI6InNvdXJjZV9xdWVyeSI7czo5OiJpcGhvbmUgMTMiO3M6NToieF9zZ3QiO3M6NDA6ImU0YTVmZTMzMTJiYzhhMTg0NjBmNjY5Y2U3MTU2MzFmOTg5NjYwNDIiO31F5ED5uQAAAA&geoCoords=55.354968%2C86.087314&presentationType=serp&radius=0&s=104",
+          min_price: 20000,
+          max_price: 75000,
+          private_only: false,
+          avg_price: 28884
+        },
+        {
+          id: "2",
+          title: "iPhone 15 Кемерово",
+          url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_15-ASgBAgICA0SywA2SoO0RtMANzqs5sMENiPw3?context=H4sIAAAAAAAA_wGgAF__YTo0OntzOjk6ImZyb21fcGFnZSI7czo3OiJmaWx0ZXJzIjtzOjE0OiJoYXNFeHRyYVBhcmFtcyI7YjoxO3M6Njoic291cmNlIjtzOjc6Imhpc3RvcnkiO3M6MTI6InNvdXJjZV9xdWVyeSI7czo5OiJpcGhvbmUgMTUiO31U1mOzuAAAAA&geoCoords=55.354968%2C86.087314&presentationType=serp&radius=0&s=104",
+          min_price: 35000,
+          max_price: 90000,
+          private_only: false,
+          avg_price: 42768
+        }
+      ];
     }
 
     const taskListEl = document.getElementById('taskList');
@@ -375,15 +398,15 @@
         card.id = `card-${index}`;
 
         const avgPrice = t.avg_price ? `~${Number(t.avg_price).toLocaleString('ru-RU')} ₽` : 'расчет...';
-        const sellerBadge = t.private_only ? '👤 Только частники' : '🏢 Все продавцы';
+        const sellerBadge = t.private_only ? '👤 Только частники' : '🏢 Все';
 
         card.innerHTML = `
           <div class="card-header" onclick="toggleExpand(${index})">
             <div class="title-area">
               <span class="live-dot"></span>
-              <span class="task-title">${t.title || 'Поиск без названия'}</span>
+              <span class="task-title">${t.title || 'Поиск'}</span>
             </div>
-            <span style="color: var(--hint); font-size: 18px;">⌄</span>
+            <span class="chevron">▼</span>
           </div>
 
           <div class="badges-row">
@@ -421,7 +444,7 @@
 
             <div class="actions">
               <button class="btn-danger" onclick="deleteTask(${index})">Удалить</button>
-              <button class="btn-secondary" onclick="toggleExpand(${index})">Свернуть</button>
+              <button class="btn-secondary" onclick="toggleExpand(${index})">Готово</button>
             </div>
           </div>
         `;
@@ -431,25 +454,26 @@
 
     function toggleExpand(index) {
       haptic('light');
-      const card = document.getElementById(`card-${index}`);
-      card.classList.toggle('expanded');
+      document.getElementById(`card-${index}`)?.classList.toggle('expanded');
     }
 
     function updateField(index, field, value) {
       tasks[index][field] = value;
+      localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
     }
 
     function togglePrivate(index, value) {
       haptic('light');
       tasks[index].private_only = value;
+      localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
       renderTasks();
-      // Оставляем карточку раскрытой
       document.getElementById(`card-${index}`)?.classList.add('expanded');
     }
 
     function deleteTask(index) {
       haptic('warning');
       tasks.splice(index, 1);
+      localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
       renderTasks();
     }
 
@@ -464,6 +488,7 @@
         private_only: false,
         avg_price: 0
       });
+      localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
       renderTasks();
       const lastIndex = tasks.length - 1;
       setTimeout(() => {
@@ -473,10 +498,11 @@
 
     document.getElementById('saveBtn').addEventListener('click', () => {
       haptic('success');
+      localStorage.setItem('cached_avito_tasks', JSON.stringify(tasks));
       if (tg) {
         tg.sendData(JSON.stringify(tasks));
       } else {
-        alert('Данные сохранены локально (откройте в Telegram)');
+        alert('Данные сохранены!');
       }
     });
 
