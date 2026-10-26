@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Управление мониторингом</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #17212b);
+      --secondary-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+      --text-color: var(--tg-theme-text-color, #f5f5f5);
+      --hint-color: var(--tg-theme-hint-color, #708499);
+      --button-color: var(--tg-theme-button-color, #5288c1);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --danger-color: #e53935;
+      --card-border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 16px;
+      font-size: 15px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--secondary-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--hint-color);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text-color);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--button-color);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row .input-group {
+      flex: 1;
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .task-info {
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .task-meta {
+      font-size: 13px;
+      color: var(--hint-color);
+    }
+
+    .del-btn {
+      background: transparent;
+      border: none;
+      color: var(--danger-color);
+      padding: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--hint-color);
+      padding: 20px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>➕ Добавить отслеживание</h2>
+  <div class="card">
+    <div class="input-group">
+      <label>Название товара / запроса</label>
+      <input type="text" id="titleInput" placeholder="Например: iPhone 15 Кемерово">
+    </div>
+    <div class="input-group">
+      <label>Ссылка на мобильный поиск Авито (m.avito.ru)</label>
+      <input type="url" id="urlInput" placeholder="https://m.avito.ru/...">
+    </div>
+    <div class="row">
+      <div class="input-group">
+        <label>Мин. цена (₽)</label>
+        <input type="number" id="minPriceInput" placeholder="25000">
+      </div>
+      <div class="input-group">
+        <label>Макс. цена (₽)</label>
+        <input type="number" id="maxPriceInput" placeholder="180000">
+      </div>
+    </div>
+    <button class="btn" style="margin-top: 14px;" onclick="addTask()">Добавить в список</button>
+  </div>
+
+  <h2>📋 Активные поиски</h2>
+  <div class="card" id="tasksList"></div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let tasks = JSON.parse(localStorage.getItem("avito_tasks")) || [
+      {
+        id: 1,
+        title: "iPhone 15 Кемерово",
+        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_15-ASgBAgICA0SywA2SoO0RtMANzqs5sMENiPw3?context=H4sIAAAAAAAA_wGgAF__YTo0OntzOjk6ImZyb21fcGFnZSI7czo3OiJmaWx0ZXJzIjtzOjY6InNvdXJjZSI7czo4OiJvcmRpbmFyeSI7czoxMjoic291cmNlX3F1ZXJ5IjtzOjk6ImlwaG9uZSAxNSI7czo1OiJ4X3NndCI7czo0MDoiZTZiYTU1YWZjMWNjMTY1MGM4ZWUyNzNkOGFlZWFkMzY5OThhZjgzNCI7fRH9b0ugAAAA&geoCoords=55.354968%2C86.087314&presentationType=serp&radius=0&s=104",
+        min_price: 25000,
+        max_price: 180000,
+        avg_price: 42768
+      }
+    ];
+
+    function renderTasks() {
+      const container = document.getElementById("tasksList");
+      container.innerHTML = "";
+
+      if (tasks.length === 0) {
+        container.innerHTML = '<div class="empty-msg">Список отслеживания пуст</div>';
+        return;
+      }
+
+      tasks.forEach((t) => {
+        const item = document.createElement("div");
+        item.className = "task-item";
+        item.innerHTML = `
+          <div class="task-info">
+            <div class="task-title">${t.title}</div>
+            <div class="task-meta">Диапазон: ${t.min_price?.toLocaleString('ru-RU')} – ${t.max_price?.toLocaleString('ru-RU')} ₽</div>
+          </div>
+          <button class="del-btn" onclick="removeTask(${t.id})">✕</button>
+        `;
+        container.appendChild(item);
+      });
+
+      tg.MainButton.text = "💾 Сохранить и применить в боте";
+      tg.MainButton.show();
+    }
+
+    function addTask() {
+      const title = document.getElementById("titleInput").value.trim();
+      const url = document.getElementById("urlInput").value.trim();
+      const min_p = parseInt(document.getElementById("minPriceInput").value) || 10000;
+      const max_p = parseInt(document.getElementById("maxPriceInput").value) || 250000;
+
+      if (!title || !url) {
+        tg.showAlert("Заполните название и вставьте ссылку!");
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(),
+        title: title,
+        url: url,
+        min_price: min_p,
+        max_price: max_p,
+        avg_price: 0
+      };
+
+      tasks.push(newTask);
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
+
+      document.getElementById("titleInput").value = "";
+      document.getElementById("urlInput").value = "";
+      renderTasks();
+    }
+
+    function removeTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    tg.onEvent("mainButtonClicked", function() {
+      tg.sendData(JSON.stringify(tasks));
+      tg.close();
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>
