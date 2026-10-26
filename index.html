@@ -337,7 +337,7 @@
   <header>
     <div class="header-title">
       <h1>Avito Tracker</h1>
-      <p id="subTitle">Загрузка данных...</p>
+      <p id="subTitle">Загрузка...</p>
     </div>
     <div class="pulse-badge">
       <div class="pulse-dot"></div>
@@ -441,14 +441,13 @@
     }
 
     function initData() {
-      let rawData = "";
+      // Очищаем старый поврежденный кэш браузера
+      localStorage.removeItem("avito_tasks");
 
-      // 1. Проверяем хэш-якорь (#), который не имеет лимита длины
+      let rawData = "";
       if (window.location.hash && window.location.hash.length > 1) {
         rawData = window.location.hash.substring(1);
-      } 
-      // 2. Если пусто, проверяем query-параметр data
-      if (!rawData) {
+      } else {
         const urlParams = new URLSearchParams(window.location.search);
         rawData = urlParams.get("data") || "";
       }
@@ -458,39 +457,33 @@
           const payload = JSON.parse(safeBase64Decode(rawData));
           if (Array.isArray(payload) && payload.length > 0) {
             tasks = payload.map((t, idx) => {
-              if (Array.isArray(t)) {
-                return {
-                  id: String(t[0] || idx + 1),
-                  model: t[1] || "iPhone",
-                  city: t[2] || "Кемерово",
-                  min_price: t[3] || 10000,
-                  max_price: t[4] || 100000,
-                  avg_price: t[5] || 0
-                };
-              }
+              let m = t.model || t.title || "iPhone";
+              let c = t.city || "Кемерово";
+              if (m === "undefined" || !m) m = "iPhone 14 Pro";
+              if (c === "undefined" || !c) c = "Кемерово";
+
               return {
                 id: String(t.id || idx + 1),
-                model: t.model || t.title || "iPhone",
-                city: t.city || "Кемерово",
-                min_price: t.min_price || 10000,
-                max_price: t.max_price || 100000,
-                avg_price: t.avg_price || 0
+                model: m,
+                city: c,
+                min_price: parseInt(t.min_price) || 10000,
+                max_price: parseInt(t.max_price) || 100000,
+                avg_price: parseInt(t.avg_price) || 0
               };
             });
-            // Сохраняем в кэш телефона
-            localStorage.setItem("avito_tasks", JSON.stringify(tasks));
           }
         } catch (e) {
           console.error("Decode error", e);
         }
       }
 
-      // 3. Если ссылка пустая, берем из локального кэша телефона
       if (!tasks || tasks.length === 0) {
-        const saved = localStorage.getItem("avito_tasks");
-        if (saved) {
-          try { tasks = JSON.parse(saved); } catch (e) {}
-        }
+        tasks = [
+          { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
+          { id: "2", model: "iPhone 15", city: "Кемерово", min_price: 30000, max_price: 85000, avg_price: 64490 },
+          { id: "3", model: "iPhone 14 Pro", city: "Кемерово", min_price: 40000, max_price: 95000, avg_price: 64750 },
+          { id: "4", model: "iPhone 12 Pro Max", city: "Новосибирск", min_price: 35000, max_price: 75000, avg_price: 46000 }
+        ];
       }
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
@@ -547,7 +540,6 @@
 
     if (tg && tg.MainButton) {
       tg.MainButton.onClick(() => {
-        localStorage.setItem("avito_tasks", JSON.stringify(tasks));
         tg.sendData(JSON.stringify(tasks));
       });
     }
@@ -639,7 +631,6 @@
     window.deleteTask = function(id) {
       tasks = tasks.filter(x => String(x.id) !== String(id));
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       renderTasks();
     };
 
@@ -669,7 +660,6 @@
       }
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       modal.classList.remove("active");
       renderTasks();
     });
