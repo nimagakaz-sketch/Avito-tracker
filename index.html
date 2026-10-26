@@ -337,7 +337,7 @@
   <header>
     <div class="header-title">
       <h1>Avito Tracker</h1>
-      <p>Поиск по городам России</p>
+      <p id="subTitle">Загрузка данных...</p>
     </div>
     <div class="pulse-badge">
       <div class="pulse-dot"></div>
@@ -441,16 +441,20 @@
     }
 
     function initData() {
-      try {
-        let rawData = "";
-        if (window.location.hash && window.location.hash.length > 1) {
-          rawData = window.location.hash.substring(1);
-        } else {
-          const urlParams = new URLSearchParams(window.location.search);
-          rawData = urlParams.get("data") || "";
-        }
+      let rawData = "";
 
-        if (rawData) {
+      // 1. Проверяем хэш-якорь (#), который не имеет лимита длины
+      if (window.location.hash && window.location.hash.length > 1) {
+        rawData = window.location.hash.substring(1);
+      } 
+      // 2. Если пусто, проверяем query-параметр data
+      if (!rawData) {
+        const urlParams = new URLSearchParams(window.location.search);
+        rawData = urlParams.get("data") || "";
+      }
+
+      if (rawData) {
+        try {
           const payload = JSON.parse(safeBase64Decode(rawData));
           if (Array.isArray(payload) && payload.length > 0) {
             tasks = payload.map((t, idx) => {
@@ -466,28 +470,30 @@
               }
               return {
                 id: String(t.id || idx + 1),
-                model: t.m || t.model || t.title || "iPhone",
-                city: t.c || t.city || "Кемерово",
-                min_price: t.min || t.min_price || 10000,
-                max_price: t.max || t.max_price || 100000,
-                avg_price: t.avg || t.avg_price || 0
+                model: t.model || t.title || "iPhone",
+                city: t.city || "Кемерово",
+                min_price: t.min_price || 10000,
+                max_price: t.max_price || 100000,
+                avg_price: t.avg_price || 0
               };
             });
+            // Сохраняем в кэш телефона
+            localStorage.setItem("avito_tasks", JSON.stringify(tasks));
           }
+        } catch (e) {
+          console.error("Decode error", e);
         }
-      } catch (e) {
-        console.error("Data error", e);
       }
 
+      // 3. Если ссылка пустая, берем из локального кэша телефона
       if (!tasks || tasks.length === 0) {
-        tasks = [
-          { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
-          { id: "2", model: "iPhone 15", city: "Кемерово", min_price: 30000, max_price: 85000, avg_price: 64490 },
-          { id: "3", model: "iPhone 11", city: "Кемерово", min_price: 7000, max_price: 22000, avg_price: 9443 },
-          { id: "4", model: "iPhone 14 Pro", city: "Кемерово", min_price: 40000, max_price: 95000, avg_price: 64750 }
-        ];
+        const saved = localStorage.getItem("avito_tasks");
+        if (saved) {
+          try { tasks = JSON.parse(saved); } catch (e) {}
+        }
       }
 
+      document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
       renderTasks();
       updateMainButton();
     }
@@ -541,6 +547,7 @@
 
     if (tg && tg.MainButton) {
       tg.MainButton.onClick(() => {
+        localStorage.setItem("avito_tasks", JSON.stringify(tasks));
         tg.sendData(JSON.stringify(tasks));
       });
     }
@@ -631,6 +638,8 @@
 
     window.deleteTask = function(id) {
       tasks = tasks.filter(x => String(x.id) !== String(id));
+      document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       renderTasks();
     };
 
@@ -659,6 +668,8 @@
         });
       }
 
+      document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       modal.classList.remove("active");
       renderTasks();
     });
