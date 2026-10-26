@@ -185,7 +185,6 @@
       margin-top: 6px;
     }
 
-    /* Нижняя плавающая кнопка */
     .bottom-bar {
       position: fixed;
       bottom: 0;
@@ -469,6 +468,18 @@
     }
 
     function initData() {
+      // 1. Сначала загружаем данные из локального хранилища устройства (если они уже есть)
+      const cached = localStorage.getItem("avito_tasks");
+      if (cached) {
+        try {
+          const parsedCache = JSON.parse(cached);
+          if (Array.isArray(parsedCache) && parsedCache.length > 0) {
+            tasks = parsedCache;
+          }
+        } catch (e) {}
+      }
+
+      // 2. Если бот передал свежий хэш, берем его и перезаписываем
       let rawData = "";
       if (window.location.hash && window.location.hash.length > 1) {
         rawData = window.location.hash.substring(1);
@@ -480,7 +491,7 @@
       if (rawData) {
         try {
           const payload = JSON.parse(safeBase64Decode(rawData));
-          if (Array.isArray(payload)) {
+          if (Array.isArray(payload) && payload.length > 0) {
             tasks = payload.map((t, idx) => ({
               id: String(t.id || idx + 1),
               model: t.model || t.title || "iPhone",
@@ -489,6 +500,7 @@
               max_price: parseInt(t.max_price) || 100000,
               avg_price: parseInt(t.avg_price) || 0
             }));
+            localStorage.setItem("avito_tasks", JSON.stringify(tasks));
           }
         } catch (e) {
           console.error("Decode error", e);
@@ -508,7 +520,7 @@
       const container = document.getElementById("taskList");
       container.innerHTML = "";
 
-      if (tasks.length === 0) {
+      if (!tasks || tasks.length === 0) {
         container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px;">Список пуст.<br>Нажмите кнопку ниже, чтобы добавить модель.</div>`;
         return;
       }
@@ -543,12 +555,12 @@
       });
     }
 
-    // Обработчик сохранения данных
     function submitTasks() {
       if (!tg) {
         alert("Откройте приложение внутри Telegram");
         return;
       }
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       tg.sendData(JSON.stringify(tasks));
     }
 
@@ -641,6 +653,7 @@
     window.deleteTask = function(id) {
       tasks = tasks.filter(x => String(x.id) !== String(id));
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       renderTasks();
     };
 
@@ -670,6 +683,7 @@
       }
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
+      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       modal.classList.remove("active");
       renderTasks();
     });
