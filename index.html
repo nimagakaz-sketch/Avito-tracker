@@ -17,7 +17,6 @@
       --danger: #f85149;
       --blue: #388bfd;
       --blue-glow: rgba(56, 139, 253, 0.2);
-      --gold: #d29922;
     }
 
     * {
@@ -99,8 +98,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Карточки задач */
-    .task-card {
+    .task-card, .deal-card, .stat-card {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -180,13 +178,8 @@
       margin-top: 2px;
     }
 
-    .market-pill {
-      color: #388bfd !important;
-    }
-
-    .profit-pill {
-      color: #3fb950 !important;
-    }
+    .market-pill { color: #388bfd !important; }
+    .profit-pill { color: #3fb950 !important; }
 
     .add-task-btn {
       width: 100%;
@@ -203,7 +196,7 @@
       gap: 8px;
       cursor: pointer;
       margin-top: 6px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .save-settings-btn {
@@ -217,18 +210,6 @@
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 20px var(--accent-glow);
-    }
-
-    /* Карточки предложений / сделок */
-    .deal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
     }
 
     .deal-badge {
@@ -250,7 +231,7 @@
     }
 
     .deal-price {
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 800;
       color: #fff;
     }
@@ -261,36 +242,20 @@
     }
 
     .btn-avito {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-radius: 12px;
       background: #388bfd;
       color: white;
       text-decoration: none;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
-      width: 100%;
+      cursor: pointer;
     }
 
-    /* Таблицы аналитики */
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .stat-header {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    /* Нижний таббар (Bottom Navigation) */
     .tabbar {
       position: fixed;
       bottom: 0;
@@ -298,7 +263,7 @@
       right: 0;
       height: calc(65px + env(safe-area-inset-bottom));
       padding-bottom: env(safe-area-inset-bottom);
-      background: rgba(13, 17, 23, 0.92);
+      background: rgba(13, 17, 23, 0.94);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -320,24 +285,12 @@
       gap: 3px;
       color: var(--text-muted);
       cursor: pointer;
-      transition: color 0.15s;
     }
 
-    .tab-btn.active {
-      color: #388bfd;
-    }
+    .tab-btn.active { color: #388bfd; }
+    .tab-icon { font-size: 19px; }
+    .tab-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
 
-    .tab-icon {
-      font-size: 19px;
-    }
-
-    .tab-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    /* Модалка добавления */
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -352,11 +305,7 @@
       transition: opacity 0.25s ease;
     }
 
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
+    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
     .modal-sheet {
       background: #161b22;
       border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -367,121 +316,31 @@
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .modal-backdrop.active .modal-sheet {
-      transform: translateY(0);
-    }
+    .modal-backdrop.active .modal-sheet { transform: translateY(0); }
 
     .sheet-handle {
-      width: 40px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      margin: -10px auto 16px;
+      width: 40px; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; margin: -10px auto 16px;
     }
 
-    .sheet-title {
-      font-size: 19px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-      position: relative;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
+    .sheet-title { font-size: 19px; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; position: relative; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
     .form-input, .form-select {
-      width: 100%;
-      padding: 14px;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      font-size: 15px;
-      color: #fff;
-      outline: none;
+      width: 100%; padding: 14px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--card-border); border-radius: 12px; font-size: 15px; color: #fff; outline: none;
     }
-
-    .form-select option {
-      background: #161b22;
-      color: #fff;
-    }
+    .form-select option { background: #161b22; color: #fff; }
 
     .city-suggestions {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      background: #1c2128;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      max-height: 180px;
-      overflow-y: auto;
-      z-index: 1050;
-      display: none;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c2128; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; max-height: 180px; overflow-y: auto; z-index: 1050; display: none;
     }
+    .city-item { padding: 12px 14px; font-size: 14px; color: #e6edf3; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+    .city-item:last-child { border-bottom: none; }
+    .city-item:hover { background: rgba(56, 139, 253, 0.2); }
 
-    .city-item {
-      padding: 12px 14px;
-      font-size: 14px;
-      color: #e6edf3;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      cursor: pointer;
-    }
-
-    .city-item:last-child {
-      border-bottom: none;
-    }
-
-    .city-item:hover, .city-item:active {
-      background: rgba(56, 139, 253, 0.2);
-    }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .sheet-btns {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .btn-secondary {
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      background: #238636;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sheet-btns { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 18px; }
+    .btn-secondary { padding: 14px; border-radius: 14px; border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.05); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn-primary { padding: 14px; border-radius: 14px; border: none; background: #238636; color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -514,8 +373,8 @@
   <div id="tab-deals" class="tab-content">
     <header>
       <div class="header-title">
-        <h1>Лучшие сделки</h1>
-        <p>Объявления ниже рынка</p>
+        <h1>🔥 Лучшие сделки</h1>
+        <p>Прямые ссылки на выгодные объявления</p>
       </div>
     </header>
     <div id="dealsList"></div>
@@ -563,7 +422,7 @@
     </button>
   </nav>
 
-  <!-- Модальное окно добавления/редактирования -->
+  <!-- Модальное окно -->
   <div class="modal-backdrop" id="modal">
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
@@ -641,6 +500,7 @@
       .catch(() => {});
 
     let tasks = [];
+    let liveDeals = [];
     let favorites = JSON.parse(localStorage.getItem("avito_favs") || "[]");
     let editTaskId = null;
 
@@ -669,27 +529,38 @@
           const jsonText = safeDecode(rawData);
           if (jsonText) {
             const payload = JSON.parse(jsonText);
-            if (Array.isArray(payload) && payload.length > 0) {
-              tasks = payload.map((t, idx) => {
-                if (Array.isArray(t)) {
-                  return {
-                    id: String(t[0] || idx + 1),
-                    model: t[1] || "iPhone",
-                    city: t[2] || "Кемерово",
-                    min_price: parseInt(t[3]) || 10000,
-                    max_price: parseInt(t[4]) || 100000,
-                    avg_price: parseInt(t[5]) || 0
-                  };
-                }
-                return {
-                  id: String(t.id || idx + 1),
-                  model: t.model || t.title || "iPhone",
-                  city: t.city || "Кемерово",
-                  min_price: parseInt(t.min_price) || 10000,
-                  max_price: parseInt(t.max_price) || 100000,
-                  avg_price: parseInt(t.avg_price) || 0
-                };
-              });
+
+            // Если пришел объект с задачами и сделками
+            if (payload && payload.t) {
+              tasks = payload.t.map((t, idx) => ({
+                id: String(t[0] || idx + 1),
+                model: t[1] || "iPhone",
+                city: t[2] || "Кемерово",
+                min_price: parseInt(t[3]) || 10000,
+                max_price: parseInt(t[4]) || 100000,
+                avg_price: parseInt(t[5]) || 0
+              }));
+              if (Array.isArray(payload.d)) {
+                liveDeals = payload.d.map(d => ({
+                  title: d[0],
+                  city: d[1],
+                  price: d[2],
+                  avg_price: d[3],
+                  profit: d[4],
+                  url: d[5],
+                  memory: d[6]
+                }));
+              }
+            } else if (Array.isArray(payload)) {
+              // Старый формат массива
+              tasks = payload.map((t, idx) => ({
+                id: String(t[0] || t.id || idx + 1),
+                model: t[1] || t.model || "iPhone",
+                city: t[2] || t.city || "Кемерово",
+                min_price: parseInt(t[3] || t.min_price) || 10000,
+                max_price: parseInt(t[4] || t.max_price) || 100000,
+                avg_price: parseInt(t[5] || t.avg_price) || 0
+              }));
             }
           }
         } catch (e) {
@@ -709,7 +580,6 @@
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
     }
 
-    // Переключение вкладок
     window.switchTab = function(tabName) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
       document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
@@ -766,54 +636,78 @@
       });
     }
 
-    // Вкладка «Сделки»
+    // Вкладка «Сделки» с прямыми ссылками на Авито
+    function openAvitoUrl(url) {
+      if (tg && tg.openLink) {
+        tg.openLink(url);
+      } else {
+        window.open(url, "_blank");
+      }
+    }
+
     function renderDeals() {
       const container = document.getElementById("dealsList");
       container.innerHTML = "";
 
-      if (tasks.length === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Сначала добавьте задачи во вкладке «Поиски».</div>`;
-        return;
-      }
-
-      let count = 0;
-      tasks.forEach(t => {
-        if (!t.avg_price || t.avg_price <= 0) return;
-        count++;
-        const goodPrice = Math.round(t.avg_price * 0.82);
-        const profit = t.avg_price - goodPrice;
-
-        const card = document.createElement("div");
-        card.className = "deal-card";
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div class="deal-badge">🔥 Выгода ~${formatPrice(profit)}</div>
-            <span style="font-size:12px; color:var(--text-muted);">📍 ${t.city}</span>
-          </div>
-          <div style="font-size:16px; font-weight:700;">${t.model}</div>
-          <div class="deal-price-row">
-            <div>
-              <span class="deal-price">${formatPrice(goodPrice)}</span>
-              <span style="font-size:12px; color:#3fb950;">(таргет для выкупа)</span>
+      if (liveDeals.length > 0) {
+        liveDeals.forEach(d => {
+          const card = document.createElement("div");
+          card.className = "deal-card";
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="deal-badge">🔥 Выгода ~${formatPrice(d.profit)}</div>
+              <span style="font-size:12px; color:var(--text-muted);">📍 ${d.city}</span>
             </div>
-            <div class="deal-market">рынок ~${formatPrice(t.avg_price)}</div>
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; margin-top:4px;">
-            <a href="https://m.avito.ru" target="_blank" class="btn-avito">↗️ Искать на Авито</a>
-            <button class="icon-btn" onclick="toggleFav('${t.model}', '${t.city}', ${goodPrice})">⭐</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
+            <div style="font-size:16px; font-weight:700;">${d.title} ${d.memory ? '<span style="font-size:13px; color:var(--blue); font-weight:normal;">(' + d.memory + ')</span>' : ''}</div>
+            <div class="deal-price-row">
+              <div class="deal-price">${formatPrice(d.price)}</div>
+              <div class="deal-market">рынок ~${formatPrice(d.avg_price)}</div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; margin-top:6px;">
+              <button class="btn-avito" onclick="openAvitoUrl('${d.url}')">↗️ Открыть на Авито</button>
+              <button class="icon-btn" onclick="toggleFav('${d.title}', '${d.city}', ${d.price}, '${d.url}')">⭐</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        // Если парсер ещё собирает данные, показываем ориентиры с поисковыми ссылками
+        if (tasks.length === 0) {
+          container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Добавьте модели в «Поисках».</div>`;
+          return;
+        }
 
-      if (count === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Идет расчет рыночных цен... Загляните через минуту.</div>`;
+        tasks.forEach(t => {
+          if (!t.avg_price || t.avg_price <= 0) return;
+          const goodPrice = Math.round(t.avg_price * 0.82);
+          const profit = t.avg_price - goodPrice;
+          const searchUrl = `https://m.avito.ru?q=${encodeURIComponent(t.model + ' ' + t.city)}&s=104`;
+
+          const card = document.createElement("div");
+          card.className = "deal-card";
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="deal-badge">🔥 Выгода от ~${formatPrice(profit)}</div>
+              <span style="font-size:12px; color:var(--text-muted);">📍 ${t.city}</span>
+            </div>
+            <div style="font-size:16px; font-weight:700;">${t.model}</div>
+            <div class="deal-price-row">
+              <div>
+                <span class="deal-price">${formatPrice(goodPrice)}</span>
+                <span style="font-size:11px; color:#3fb950;">(таргет выкупа)</span>
+              </div>
+              <div class="deal-market">рынок ~${formatPrice(t.avg_price)}</div>
+            </div>
+            <button class="btn-avito" style="margin-top:6px;" onclick="openAvitoUrl('${searchUrl}')">↗️ Искать свежие предложения</button>
+          `;
+          container.appendChild(card);
+        });
       }
     }
 
     // Вкладка «Избранное»
-    window.toggleFav = function(title, city, price) {
-      favorites.push({ id: Date.now(), title, city, price });
+    window.toggleFav = function(title, city, price, url) {
+      favorites.push({ id: Date.now(), title, city, price, url });
       localStorage.setItem("avito_favs", JSON.stringify(favorites));
       alert("⭐ Добавлено в Избранное!");
     };
@@ -829,7 +723,7 @@
       container.innerHTML = "";
 
       if (!favorites || favorites.length === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">У вас пока нет сохраненных предложений. Добавляйте их из вкладки «Сделки».</div>`;
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">У вас пока нет сохраненных предложений. Добавляйте их кнопкой ⭐ из «Сделок».</div>`;
         return;
       }
 
@@ -843,18 +737,19 @@
           </div>
           <div style="font-size:13px; color:var(--blue);">📍 ${f.city}</div>
           <div class="deal-price">${formatPrice(f.price)}</div>
+          <button class="btn-avito" style="margin-top:4px;" onclick="openAvitoUrl('${f.url}')">↗️ Открыть объявление</button>
         `;
         container.appendChild(card);
       });
     }
 
-    // Вкладка «Аналитика рынка»
+    // Вкладка «Аналитика»
     function renderAnalytics() {
       const container = document.getElementById("analyticsList");
       container.innerHTML = "";
 
       if (tasks.length === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Нет данных для аналитики.</div>`;
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px 0;">Нет данных.</div>`;
         return;
       }
 
@@ -866,7 +761,7 @@
         const card = document.createElement("div");
         card.className = "stat-card";
         card.innerHTML = `
-          <div class="stat-header">${t.model} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${t.city})</span></div>
+          <div style="font-size:16px; font-weight:700;">${t.model} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${t.city})</span></div>
           <div class="task-meta" style="margin-top:8px;">
             <div class="meta-box">
               <p>Средний рынок</p>
@@ -886,7 +781,7 @@
       });
     }
 
-    // Сохранение и передача боту
+    // Сохранение настроек
     document.getElementById("btnSubmit").addEventListener("click", () => {
       if (!tg) {
         alert("Откройте приложение внутри Telegram");
@@ -902,14 +797,10 @@
     inputCity.addEventListener("input", () => {
       const val = inputCity.value.trim().toLowerCase();
       cityList.innerHTML = "";
-      if (!val) {
-        cityList.style.display = "none";
-        return;
-      }
+      if (!val) { cityList.style.display = "none"; return; }
 
       const startsWith = [];
       const contains = [];
-
       for (let i = 0; i < ALL_CITIES.length; i++) {
         const c = ALL_CITIES[i];
         const low = c.toLowerCase();
@@ -917,12 +808,8 @@
         else if (low.includes(val)) contains.push(c);
         if (startsWith.length + contains.length > 25) break;
       }
-
       const matches = [...startsWith, ...contains].slice(0, 15);
-      if (matches.length === 0) {
-        cityList.style.display = "none";
-        return;
-      }
+      if (matches.length === 0) { cityList.style.display = "none"; return; }
 
       matches.forEach(cityName => {
         const item = document.createElement("div");
@@ -934,17 +821,14 @@
         });
         cityList.appendChild(item);
       });
-
       cityList.style.display = "block";
     });
 
     document.addEventListener("click", (e) => {
-      if (!inputCity.contains(e.target) && !cityList.contains(e.target)) {
-        cityList.style.display = "none";
-      }
+      if (!inputCity.contains(e.target) && !cityList.contains(e.target)) cityList.style.display = "none";
     });
 
-    // Модальное окно
+    // Модалка
     const modal = document.getElementById("modal");
     const btnOpenAdd = document.getElementById("btnOpenAdd");
     const btnCancel = document.getElementById("btnCancel");
