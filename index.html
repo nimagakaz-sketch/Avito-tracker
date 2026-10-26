@@ -84,45 +84,6 @@
       100% { transform: scale(0.95); opacity: 0.7; }
     }
 
-    .tabs-nav {
-      display: flex;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 4px;
-      border-radius: 14px;
-      margin-bottom: 18px;
-      border: 1px solid var(--card-border);
-    }
-
-    .tab-btn {
-      flex: 1;
-      text-align: center;
-      padding: 10px 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: 10px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: rgba(255, 255, 255, 0.14);
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .tab-content {
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .tab-content.active {
-      display: flex;
-    }
-
     .task-card {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
@@ -130,6 +91,7 @@
       border: 1px solid var(--card-border);
       border-radius: 18px;
       padding: 16px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -149,19 +111,15 @@
       line-height: 1.3;
     }
 
-    .task-url-tag {
+    .task-city-tag {
       font-size: 11px;
       color: var(--blue);
       background: var(--blue-glow);
       padding: 3px 8px;
       border-radius: 8px;
-      text-decoration: none;
       display: inline-block;
       margin-top: 4px;
-      max-width: 210px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: 600;
     }
 
     .task-actions {
@@ -224,7 +182,7 @@
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
     .modal-backdrop {
@@ -289,7 +247,7 @@
       letter-spacing: 0.5px;
     }
 
-    .form-input {
+    .form-input, .form-select {
       width: 100%;
       padding: 14px;
       background: rgba(0, 0, 0, 0.35);
@@ -298,6 +256,11 @@
       font-size: 15px;
       color: #fff;
       outline: none;
+    }
+
+    .form-select option {
+      background: #161b22;
+      color: #fff;
     }
 
     .input-row {
@@ -342,7 +305,7 @@
   <header>
     <div class="header-title">
       <h1>Avito Tracker</h1>
-      <p>Мониторинг цен в реальном времени</p>
+      <p>Автоматический поиск по городам</p>
     </div>
     <div class="pulse-badge">
       <div class="pulse-dot"></div>
@@ -350,16 +313,11 @@
     </div>
   </header>
 
-  <div class="tabs-nav">
-    <button class="tab-btn active">⚙️ Активные поиски</button>
-  </div>
+  <div class="task-list" id="taskList"></div>
 
-  <div class="tab-content active">
-    <div class="task-list" id="taskList"></div>
-    <button class="add-task-btn" id="btnOpenAdd">
-      <span>➕</span> Добавить модель для отслеживания
-    </button>
-  </div>
+  <button class="add-task-btn" id="btnOpenAdd">
+    <span>➕</span> Добавить телефон и город
+  </button>
 
   <div class="modal-backdrop" id="modal">
     <div class="modal-sheet">
@@ -367,23 +325,40 @@
       <div class="sheet-title" id="modalTitle">Настройка поиска</div>
 
       <div class="form-group">
-        <label>Название модели</label>
-        <input type="text" id="inputTitle" class="form-input" placeholder="Например: iPhone 15 Pro">
+        <label>Модель iPhone</label>
+        <select id="selectModel" class="form-select">
+          <option value="iPhone 16 Pro Max">iPhone 16 Pro Max</option>
+          <option value="iPhone 16 Pro">iPhone 16 Pro</option>
+          <option value="iPhone 16">iPhone 16</option>
+          <option value="iPhone 15 Pro Max">iPhone 15 Pro Max</option>
+          <option value="iPhone 15 Pro">iPhone 15 Pro</option>
+          <option value="iPhone 15">iPhone 15</option>
+          <option value="iPhone 14 Pro Max">iPhone 14 Pro Max</option>
+          <option value="iPhone 14 Pro" selected>iPhone 14 Pro</option>
+          <option value="iPhone 14">iPhone 14</option>
+          <option value="iPhone 13 Pro Max">iPhone 13 Pro Max</option>
+          <option value="iPhone 13 Pro">iPhone 13 Pro</option>
+          <option value="iPhone 13">iPhone 13</option>
+          <option value="iPhone 12 Pro Max">iPhone 12 Pro Max</option>
+          <option value="iPhone 12 Pro">iPhone 12 Pro</option>
+          <option value="iPhone 12">iPhone 12</option>
+          <option value="iPhone 11">iPhone 11</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label>Ссылка поиска на Авито</label>
-        <input type="text" id="inputUrl" class="form-input" placeholder="https://m.avito.ru/kemerovo/telefony/...">
+        <label>Город или область</label>
+        <input type="text" id="inputCity" class="form-input" placeholder="Кемерово, Новокузнецк, Москва...">
       </div>
 
       <div class="input-row">
         <div class="form-group">
           <label>Мин. цена (₽)</label>
-          <input type="number" id="inputMin" class="form-input" placeholder="5000">
+          <input type="number" id="inputMin" class="form-input" placeholder="20000">
         </div>
         <div class="form-group">
           <label>Макс. цена (₽)</label>
-          <input type="number" id="inputMax" class="form-input" placeholder="120000">
+          <input type="number" id="inputMax" class="form-input" placeholder="95000">
         </div>
       </div>
 
@@ -401,40 +376,11 @@
       tg.expand();
     }
 
-    // Дефолтный список моделей, если URL открыт без параметров
     let tasks = [
-      {
-        id: "1",
-        title: "iPhone 13",
-        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_13-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2M_Dc?s=104",
-        min_price: 20000,
-        max_price: 55000,
-        avg_price: 28813
-      },
-      {
-        id: "2",
-        title: "iPhone 15 Кемерово",
-        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_15-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2I_Dc?s=104",
-        min_price: 30000,
-        max_price: 85000,
-        avg_price: 64490
-      },
-      {
-        id: "3",
-        title: "iPhone 11",
-        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_11-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2E_Dc?s=104",
-        min_price: 7000,
-        max_price: 22000,
-        avg_price: 9443
-      },
-      {
-        id: "4",
-        title: "iPhone 14 Pro",
-        url: "https://m.avito.ru/kemerovo/telefony/mobilnye_telefony/apple/iphone_14_pro-ASgBAgICA0SywA2kmzm0wA30qzmwwQ2K_Dc?s=104",
-        min_price: 40000,
-        max_price: 95000,
-        avg_price: 0
-      }
+      { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
+      { id: "2", model: "iPhone 15", city: "Кемерово", min_price: 30000, max_price: 85000, avg_price: 64490 },
+      { id: "3", model: "iPhone 11", city: "Кемерово", min_price: 7000, max_price: 22000, avg_price: 9443 },
+      { id: "4", model: "iPhone 14 Pro", city: "Кемерово", min_price: 40000, max_price: 95000, avg_price: 64750 }
     ];
 
     let editTaskId = null;
@@ -454,16 +400,20 @@
         const params = new URLSearchParams(window.location.search);
         const encoded = params.get("data");
         if (encoded) {
-          const decodedStr = safeBase64Decode(encoded);
-          const payload = JSON.parse(decodedStr);
+          const payload = JSON.parse(safeBase64Decode(encoded));
           if (Array.isArray(payload) && payload.length > 0) {
-            tasks = payload;
-          } else if (payload && typeof payload === 'object' && Array.isArray(payload.tasks) && payload.tasks.length > 0) {
-            tasks = payload.tasks;
+            tasks = payload.map(t => ({
+              id: String(t.id || Date.now()),
+              model: t.model || t.title || "iPhone",
+              city: t.city || "Кемерово",
+              min_price: t.min_price || 10000,
+              max_price: t.max_price || 100000,
+              avg_price: t.avg_price || 0
+            }));
           }
         }
       } catch (e) {
-        console.error("Ошибка чтения данных:", e);
+        console.error("Data error", e);
       }
       renderTasks();
       updateMainButton();
@@ -484,8 +434,8 @@
         card.innerHTML = `
           <div class="task-top">
             <div>
-              <div class="task-name">${t.title || "Без названия"}</div>
-              <a href="${t.url}" target="_blank" class="task-url-tag">🔗 ${t.url || "Ссылка не указана"}</a>
+              <div class="task-name">${t.model}</div>
+              <div class="task-city-tag">📍 ${t.city}</div>
             </div>
             <div class="task-actions">
               <button class="icon-btn" onclick="openEdit('${t.id}')">✏️</button>
@@ -530,10 +480,10 @@
     btnOpenAdd.addEventListener("click", () => {
       editTaskId = null;
       document.getElementById("modalTitle").innerText = "Новый поиск";
-      document.getElementById("inputTitle").value = "";
-      document.getElementById("inputUrl").value = "";
-      document.getElementById("inputMin").value = "5000";
-      document.getElementById("inputMax").value = "120000";
+      document.getElementById("selectModel").value = "iPhone 14 Pro";
+      document.getElementById("inputCity").value = "Кемерово";
+      document.getElementById("inputMin").value = "35000";
+      document.getElementById("inputMax").value = "90000";
       modal.classList.add("active");
     });
 
@@ -546,10 +496,10 @@
       if (!task) return;
       editTaskId = id;
       document.getElementById("modalTitle").innerText = "Редактирование";
-      document.getElementById("inputTitle").value = task.title || "";
-      document.getElementById("inputUrl").value = task.url || "";
-      document.getElementById("inputMin").value = task.min_price || 5000;
-      document.getElementById("inputMax").value = task.max_price || 120000;
+      document.getElementById("selectModel").value = task.model || "iPhone 14 Pro";
+      document.getElementById("inputCity").value = task.city || "Кемерово";
+      document.getElementById("inputMin").value = task.min_price || 20000;
+      document.getElementById("inputMax").value = task.max_price || 100000;
       modal.classList.add("active");
     };
 
@@ -559,31 +509,24 @@
     };
 
     btnSave.addEventListener("click", () => {
-      const title = document.getElementById("inputTitle").value.trim();
-      let url = document.getElementById("inputUrl").value.trim();
-      const minP = parseInt(document.getElementById("inputMin").value) || 0;
-      const maxP = parseInt(document.getElementById("inputMax").value) || 200000;
-
-      if (!title || !url) {
-        alert("Заполните название и ссылку");
-        return;
-      }
-
-      const cleanUrl = url.split("?")[0] + "?s=104";
+      const model = document.getElementById("selectModel").value;
+      const city = document.getElementById("inputCity").value.trim() || "Кемерово";
+      const minP = parseInt(document.getElementById("inputMin").value) || 5000;
+      const maxP = parseInt(document.getElementById("inputMax").value) || 150000;
 
       if (editTaskId) {
         const item = tasks.find(x => String(x.id) === String(editTaskId));
         if (item) {
-          item.title = title;
-          item.url = cleanUrl;
+          item.model = model;
+          item.city = city;
           item.min_price = minP;
           item.max_price = maxP;
         }
       } else {
         tasks.push({
           id: String(Date.now()),
-          title: title,
-          url: cleanUrl,
+          model: model,
+          city: city,
           min_price: minP,
           max_price: maxP,
           avg_price: 0
