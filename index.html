@@ -235,6 +235,7 @@
 
     .form-group {
       margin-bottom: 14px;
+      position: relative;
     }
 
     .form-group label {
@@ -261,6 +262,38 @@
     .form-select option {
       background: #161b22;
       color: #fff;
+    }
+
+    /* Выпадающий список городов */
+    .city-suggestions {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #1c2128;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      max-height: 170px;
+      overflow-y: auto;
+      z-index: 1050;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .city-item {
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #e6edf3;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    .city-item:last-child {
+      border-bottom: none;
+    }
+
+    .city-item:active {
+      background: rgba(56, 139, 253, 0.2);
     }
 
     .input-row {
@@ -348,7 +381,8 @@
 
       <div class="form-group">
         <label>Город или область</label>
-        <input type="text" id="inputCity" class="form-input" placeholder="Кемерово, Новокузнецк, Москва...">
+        <input type="text" id="inputCity" class="form-input" placeholder="Начните вводить город..." autocomplete="off">
+        <div id="cityList" class="city-suggestions"></div>
       </div>
 
       <div class="input-row">
@@ -375,6 +409,14 @@
       tg.ready();
       tg.expand();
     }
+
+    // База городов для подсказок
+    const POPULAR_CITIES = [
+      "Кемерово", "Новокузнецк", "Прокопьевск", "Ленинск-Кузнецкий", 
+      "Белово", "Междуреченск", "Юрга", "Анжеро-Судженск", 
+      "Кузбасс (область)", "Новосибирск", "Томск", "Барнаул", 
+      "Красноярск", "Омск", "Москва", "Санкт-Петербург", "Россия"
+    ];
 
     let tasks = [
       { id: "1", model: "iPhone 13", city: "Кемерово", min_price: 20000, max_price: 55000, avg_price: 28813 },
@@ -472,6 +514,44 @@
       });
     }
 
+    // Автодополнение города при вводе
+    const inputCity = document.getElementById("inputCity");
+    const cityList = document.getElementById("cityList");
+
+    inputCity.addEventListener("input", () => {
+      const val = inputCity.value.trim().toLowerCase();
+      cityList.innerHTML = "";
+      if (!val) {
+        cityList.style.display = "none";
+        return;
+      }
+
+      const matches = POPULAR_CITIES.filter(c => c.toLowerCase().includes(val));
+      if (matches.length === 0) {
+        cityList.style.display = "none";
+        return;
+      }
+
+      matches.forEach(cityName => {
+        const item = document.createElement("div");
+        item.className = "city-item";
+        item.innerText = cityName;
+        item.addEventListener("click", () => {
+          inputCity.value = cityName;
+          cityList.style.display = "none";
+        });
+        cityList.appendChild(item);
+      });
+
+      cityList.style.display = "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!inputCity.contains(e.target) && !cityList.contains(e.target)) {
+        cityList.style.display = "none";
+      }
+    });
+
     const modal = document.getElementById("modal");
     const btnOpenAdd = document.getElementById("btnOpenAdd");
     const btnCancel = document.getElementById("btnCancel");
@@ -484,6 +564,7 @@
       document.getElementById("inputCity").value = "Кемерово";
       document.getElementById("inputMin").value = "35000";
       document.getElementById("inputMax").value = "90000";
+      cityList.style.display = "none";
       modal.classList.add("active");
     });
 
@@ -500,6 +581,7 @@
       document.getElementById("inputCity").value = task.city || "Кемерово";
       document.getElementById("inputMin").value = task.min_price || 20000;
       document.getElementById("inputMax").value = task.max_price || 100000;
+      cityList.style.display = "none";
       modal.classList.add("active");
     };
 
