@@ -428,7 +428,6 @@
       .catch(() => {});
 
     let tasks = [];
-
     let editTaskId = null;
 
     function safeBase64Decode(str) {
@@ -443,25 +442,37 @@
 
     function initData() {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        let encoded = urlParams.get("data");
-
-        if (!encoded && window.location.hash) {
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          encoded = hashParams.get("data");
+        let rawData = "";
+        if (window.location.hash && window.location.hash.length > 1) {
+          rawData = window.location.hash.substring(1);
+        } else {
+          const urlParams = new URLSearchParams(window.location.search);
+          rawData = urlParams.get("data") || "";
         }
 
-        if (encoded) {
-          const payload = JSON.parse(safeBase64Decode(encoded));
+        if (rawData) {
+          const payload = JSON.parse(safeBase64Decode(rawData));
           if (Array.isArray(payload) && payload.length > 0) {
-            tasks = payload.map((t, idx) => ({
-              id: String(t.id || idx + 1),
-              model: t.m || t.model || t.title || "iPhone",
-              city: t.c || t.city || "Кемерово",
-              min_price: t.min || t.min_price || 10000,
-              max_price: t.max || t.max_price || 100000,
-              avg_price: t.avg || t.avg_price || 0
-            }));
+            tasks = payload.map((t, idx) => {
+              if (Array.isArray(t)) {
+                return {
+                  id: String(t[0] || idx + 1),
+                  model: t[1] || "iPhone",
+                  city: t[2] || "Кемерово",
+                  min_price: t[3] || 10000,
+                  max_price: t[4] || 100000,
+                  avg_price: t[5] || 0
+                };
+              }
+              return {
+                id: String(t.id || idx + 1),
+                model: t.m || t.model || t.title || "iPhone",
+                city: t.c || t.city || "Кемерово",
+                min_price: t.min || t.min_price || 10000,
+                max_price: t.max || t.max_price || 100000,
+                avg_price: t.avg || t.avg_price || 0
+              };
+            });
           }
         }
       } catch (e) {
