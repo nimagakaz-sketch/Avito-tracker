@@ -457,50 +457,53 @@
     let tasks = [];
     let editTaskId = null;
 
-    function safeBase64Decode(str) {
+    function safeDecode(b64) {
       try {
-        const binString = atob(str);
-        const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+        let str = b64.replace(/-/g, "+").replace(/_/g, "/");
+        while (str.length % 4) str += "=";
+        const bin = atob(str);
+        const bytes = Uint8Array.from(bin, m => m.codePointAt(0));
         return new TextDecoder().decode(bytes);
       } catch (e) {
-        return decodeURIComponent(escape(atob(str)));
+        return "";
       }
     }
 
     function initData() {
-      // 1. Сначала загружаем данные из локального хранилища устройства (если они уже есть)
-      const cached = localStorage.getItem("avito_tasks");
-      if (cached) {
-        try {
-          const parsedCache = JSON.parse(cached);
-          if (Array.isArray(parsedCache) && parsedCache.length > 0) {
-            tasks = parsedCache;
-          }
-        } catch (e) {}
-      }
+      const urlParams = new URLSearchParams(window.location.search);
+      let rawData = urlParams.get("d") || urlParams.get("data") || "";
 
-      // 2. Если бот передал свежий хэш, берем его и перезаписываем
-      let rawData = "";
-      if (window.location.hash && window.location.hash.length > 1) {
+      if (!rawData && window.location.hash && window.location.hash.length > 1) {
         rawData = window.location.hash.substring(1);
-      } else {
-        const urlParams = new URLSearchParams(window.location.search);
-        rawData = urlParams.get("data") || "";
       }
 
       if (rawData) {
         try {
-          const payload = JSON.parse(safeBase64Decode(rawData));
-          if (Array.isArray(payload) && payload.length > 0) {
-            tasks = payload.map((t, idx) => ({
-              id: String(t.id || idx + 1),
-              model: t.model || t.title || "iPhone",
-              city: t.city || "Кемерово",
-              min_price: parseInt(t.min_price) || 10000,
-              max_price: parseInt(t.max_price) || 100000,
-              avg_price: parseInt(t.avg_price) || 0
-            }));
-            localStorage.setItem("avito_tasks", JSON.stringify(tasks));
+          const jsonText = safeDecode(rawData);
+          if (jsonText) {
+            const payload = JSON.parse(jsonText);
+            if (Array.isArray(payload) && payload.length > 0) {
+              tasks = payload.map((t, idx) => {
+                if (Array.isArray(t)) {
+                  return {
+                    id: String(t[0] || idx + 1),
+                    model: t[1] || "iPhone",
+                    city: t[2] || "Кемерово",
+                    min_price: parseInt(t[3]) || 10000,
+                    max_price: parseInt(t[4]) || 100000,
+                    avg_price: parseInt(t[5]) || 0
+                  };
+                }
+                return {
+                  id: String(t.id || idx + 1),
+                  model: t.model || t.title || "iPhone",
+                  city: t.city || "Кемерово",
+                  min_price: parseInt(t.min_price) || 10000,
+                  max_price: parseInt(t.max_price) || 100000,
+                  avg_price: parseInt(t.avg_price) || 0
+                };
+              });
+            }
           }
         } catch (e) {
           console.error("Decode error", e);
@@ -560,7 +563,6 @@
         alert("Откройте приложение внутри Telegram");
         return;
       }
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       tg.sendData(JSON.stringify(tasks));
     }
 
@@ -653,7 +655,6 @@
     window.deleteTask = function(id) {
       tasks = tasks.filter(x => String(x.id) !== String(id));
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       renderTasks();
     };
 
@@ -683,7 +684,6 @@
       }
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
-      localStorage.setItem("avito_tasks", JSON.stringify(tasks));
       modal.classList.remove("active");
       renderTasks();
     });
