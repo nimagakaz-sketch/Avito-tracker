@@ -30,7 +30,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      padding: 16px 16px 120px;
+      padding: 16px 16px 140px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -183,6 +183,30 @@
       gap: 8px;
       cursor: pointer;
       margin-top: 6px;
+    }
+
+    /* Нижняя плавающая кнопка */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(11, 14, 20, 0) 0%, rgba(11, 14, 20, 0.95) 30%, #0b0e14 100%);
+      z-index: 100;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: #2ea043;
+      border: none;
+      border-radius: 16px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
     }
 
     .modal-backdrop {
@@ -351,6 +375,10 @@
     <span>➕</span> Добавить телефон и город
   </button>
 
+  <div class="bottom-bar">
+    <button class="submit-btn" id="btnSubmit">СОХРАНИТЬ И ПРИМЕНИТЬ</button>
+  </div>
+
   <div class="modal-backdrop" id="modal">
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
@@ -469,7 +497,6 @@
 
       document.getElementById("subTitle").innerText = `Отслеживается моделей: ${tasks.length}`;
       renderTasks();
-      updateMainButton();
     }
 
     function formatPrice(num) {
@@ -516,19 +543,16 @@
       });
     }
 
-    function updateMainButton() {
-      if (!tg || !tg.MainButton) return;
-      tg.MainButton.text = "СОХРАНИТЬ И ПРИМЕНИТЬ";
-      tg.MainButton.color = "#2ea043";
-      tg.MainButton.textColor = "#ffffff";
-      tg.MainButton.show();
+    // Обработчик сохранения данных
+    function submitTasks() {
+      if (!tg) {
+        alert("Откройте приложение внутри Telegram");
+        return;
+      }
+      tg.sendData(JSON.stringify(tasks));
     }
 
-    if (tg && tg.MainButton) {
-      tg.MainButton.onClick(() => {
-        tg.sendData(JSON.stringify(tasks));
-      });
-    }
+    document.getElementById("btnSubmit").addEventListener("click", submitTasks);
 
     const inputCity = document.getElementById("inputCity");
     const cityList = document.getElementById("cityList");
